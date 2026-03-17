@@ -3,13 +3,14 @@ import ApiError from "@core/utils/apiError"
 import { env } from "@core/config/env.config"
 import { RegisterDto, LoginDto, UpdateProfileDto, ChangePasswordDto } from "./dto/auth.dto"
 import jwt, { JwtPayload } from "jsonwebtoken"
+import mongoose from "mongoose"
 import { IUser, UserStatus } from "./auth.model"
 
 interface TokenPayload extends JwtPayload {
     userId: string
     username: string
     email: string
-    roles: string[]
+    roles: mongoose.Types.ObjectId[]
 }
 
 interface RefreshTokenPayload extends JwtPayload {
@@ -27,12 +28,14 @@ const generateTokens = (user: IUser): { accessToken: string, refreshToken: strin
     }
 
     const accessToken = jwt.sign(payload, env.jwt.secret, {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         expiresIn: env.jwt.expire_access as any,
     })
 
     const refreshToken = jwt.sign(
         { userId: user._id.toString(), type: "refresh" },
         env.jwt.secret,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         { expiresIn: env.jwt.expire_refresh as any }
     )
 
@@ -202,7 +205,7 @@ export default {
 
             const result = generateTokens(user)
             return { data: result }
-        } catch (error) {
+        } catch {
             return new ApiError(401, "Token không hợp lệ", "token", [
                 "Refresh token đã hết hạn hoặc không hợp lệ",
             ])

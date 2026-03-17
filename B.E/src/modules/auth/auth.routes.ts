@@ -1,4 +1,4 @@
-import { Router, Request, Response, NextFunction } from "express"
+import { Router, Response, NextFunction } from "express"
 import controller from "./auth.controller"
 import validateDTO from "@core/middlewares/dtoValidator"
 import { RegisterDto, LoginDto, UpdateProfileDto, ChangePasswordDto } from "./dto/auth.dto"

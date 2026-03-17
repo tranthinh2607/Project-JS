@@ -3,10 +3,11 @@ import ApiError from "../utils/apiError"
 import logger from "../utils/logger"
 
 export default function errorMiddleware(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     err: any,
     req: Request,
     res: Response,
-    next: NextFunction
+    _next: NextFunction
 ) {
 
     if (err instanceof ApiError) {
