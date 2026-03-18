@@ -26,8 +26,10 @@ export class RegisterDto {
 }
 
 export class LoginDto {
-    @IsString({ message: "Username/Email phải là chuỗi ký tự" })
-    identifier!: string
+    @IsString({ message: "Username phải là chuỗi ký tự" })
+    @MinLength(3, { message: "Username phải có ít nhất 3 ký tự" })
+    @MaxLength(50, { message: "Username không được vượt quá 50 ký tự" })
+    username!: string
 
     @IsString({ message: "Password phải là chuỗi ký tự" })
     password!: string

@@ -1,4 +1,5 @@
 import { IUser, User, UserStatus } from "./auth.model"
+import { Role } from "../role/role.model"
 import mongoose from "mongoose"
 import { RegisterDto, UpdateProfileDto } from "./dto/auth.dto"
 import logger from "@core/utils/logger"
@@ -44,7 +45,9 @@ export default {
             if (!mongoose.Types.ObjectId.isValid(id)) {
                 return null
             }
-            const user = await User.findById(id).exec()
+            const user = await User.findById(id)
+                .populate("roles", "name")
+                .exec()
             return user
         } catch (error) {
             logger.error("Error finding user by id", { id, error })
@@ -54,11 +57,19 @@ export default {
 
     async create(data: RegisterDto): Promise<IUser> {
         try {
+            // Find the default "user" role
+            const defaultRole = await Role.findOne({ name: "user" })
+
+            if (!defaultRole) {
+                logger.error("Default role 'user' not found in database")
+                throw new Error("Default role 'user' not found. Please seed roles first.")
+            }
+
             const user = new User({
                 username: data.username,
                 email: data.email.toLowerCase(),
                 password: data.password,
-                roles: ["user"],
+                roles: [defaultRole._id],
                 providers: [{ provider: "local", providerId: null }],
                 status: UserStatus.ACTIVE,
             })
