@@ -8,6 +8,7 @@ import { ItemRow, LoadingPage, NotFoundPage } from "../../../core/layouts";
 import FormUpdate from "../components/FormUpdate";
 import { formatDate } from "../../../core/utils/formatDate";
 import { MemberPage } from "../../members";
+import { TaskPage } from "../../tasks";
 
 interface IProps {
     projectId?: string | null;
@@ -98,6 +99,11 @@ function DetailPage({ projectId }: IProps) {
                                     </div>
                                 </div>
                             )
+                        },
+                        {
+                            key: "tasks",
+                            label: "Nhiệm vụ",
+                            children: <TaskPage projectId={project._id} />
                         },
                         {
                             key: "members",

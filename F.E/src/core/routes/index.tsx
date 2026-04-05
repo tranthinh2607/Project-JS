@@ -3,8 +3,8 @@ import { createBrowserRouter, Outlet } from "react-router-dom";
 import { MasterLayout } from "../layouts";
 import { ProtectedRoute, PublicRoute } from "../routing";
 import { DashboardPage } from "../../modules/dashboard";
+import { BuildingPage, SystemConfigsPage } from "../../modules/systems";
 import { LoginPage, RegisterPage } from "../../modules/auth";
-import { BuildingPage } from "../../modules/systems";
 import { ProjectDetailPage, ProjectListPage } from "../../modules/projects";
 
 export const router = createBrowserRouter([
@@ -19,6 +19,7 @@ export const router = createBrowserRouter([
       { path: "/", element: <DashboardPage /> },
       { path: "/projects", element: <ProjectListPage /> },
       { path: "/projects/:id", element: <ProjectDetailPage /> },
+      { path: "/settings/system-configs", element: <SystemConfigsPage /> },
     ]
   },
   {
@@ -31,6 +32,9 @@ export const router = createBrowserRouter([
     children: [
       { path: "login", element: <LoginPage /> },
       { path: "register", element: <RegisterPage /> },
+      // { path: "activate-otp", element: <ActivateOtpPage /> },
+      // { path: "forgot-password", element: <ForgotPasswordPage /> },
+      // { path: "token-expired", element: <TokenExpiredPage /> },
       { path: "/*", element: <BuildingPage /> },
     ],
   },
