@@ -1,0 +1,96 @@
+@keyframes gradientBG {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* .animated-gradient {
+  background: linear-gradient(-45deg,
+      #C9A85D,
+      #F5D98A,
+      #F5D98A,
+      #C9A85D);
+  background-size: 300% 300%;
+  animation: gradientBG 12s ease infinite;
+} */
+
+
+@keyframes color-change {
+  0% {
+    color: #C9A85D;
+  }
+
+  25% {
+    color: #F5D98A;
+  }
+
+  50% {
+    color: #C9A85D;
+  }
+
+  75% {
+    color: #F5D98A;
+  }
+
+  100% {
+    color: #C9A85D;
+  }
+}
+
+.animate-color-change {
+  animation: color-change 2s infinite;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in {
+  0% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.4s ease-out forwards;
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}

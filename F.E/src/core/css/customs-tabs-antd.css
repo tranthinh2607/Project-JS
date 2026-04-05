@@ -1,0 +1,11 @@
+.ant-tabs .ant-tabs-tab+.ant-tabs-tab {
+    margin: 0 0 0 20px;
+}
+
+.ant-tabs>div>.ant-tabs-nav {
+    margin-bottom: 0;
+}
+
+.ant-divider-horizontal {
+    margin: 15px 0 !important;
+}
