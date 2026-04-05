@@ -1,6 +1,7 @@
 import fs from "fs"
 import path from "path"
 import { Express } from "express"
+import logger from "@core/utils/logger"
 
 export default function moduleLoader(app: Express) {
 
@@ -14,7 +15,7 @@ export default function moduleLoader(app: Express) {
             moduleName,
             `${moduleName}.routes`
         )
-        console.log(routeFile)
+        logger.info(`Loading route: ${routeFile}`)
 
         if (fs.existsSync(routeFile + ".ts") || fs.existsSync(routeFile + ".js")) {
 

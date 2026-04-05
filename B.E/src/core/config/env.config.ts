@@ -13,6 +13,14 @@ export const env = {
         mongoUri: process.env.MONGO_URI,
     },
 
+    mail: {
+        host: process.env.MAIL_HOST || "smtp.gmail.com",
+        port: parseInt(process.env.MAIL_PORT || "587"),
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS,
+        from: process.env.MAIL_FROM || '"TaskFlow" <no-reply@taskflow.com>',
+    },
+
     jwt: {
         secret: process.env.JWT_SECRET!,
         expire_refresh: process.env.JWT_EXPIRE_REFRESH,

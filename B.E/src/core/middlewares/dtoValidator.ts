@@ -4,6 +4,7 @@ import { validate } from "class-validator"
 import ApiError from "../utils/apiError"
 import { Request } from "@core/types/request"
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function validateDTO(dtoClass: any) {
     return async (req: Request, res: Response, next: NextFunction) => {
 
