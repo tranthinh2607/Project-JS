@@ -1,12 +1,14 @@
 import { Router } from "express"
 import controller from "./tasks.controller"
 import statusController from "./status/task-status.controller"
+import assigneeController from "./assignees/task-assignee.controller"
+import checklistController from "./checklists/checklist.controller"
 import validateDTO from "@core/middlewares/dtoValidator"
 import { CreateTaskDto, UpdateTaskDto } from "./dto/tasks.dto"
 import { ChangeTaskStatusDto } from "./status/dto/task-status.dto"
 import { AssignTaskDto } from "./assignees/dto/task-assignee.dto"
+import { CreateChecklistItemDto, ToggleChecklistItemDto } from "./checklists/dto/checklist.dto"
 import authMiddleware from "@core/middlewares/auth.middleware"
-import assigneeController from "./assignees/task-assignee.controller"
 
 const router = Router()
 
@@ -24,5 +26,10 @@ router.get("/:id/status-history", statusController.getHistory)
 router.post("/:id/assign", validateDTO(AssignTaskDto), assigneeController.assignUser)
 router.delete("/:id/assign/:userId", assigneeController.unassignUser)
 
+// Checklist routes
+router.post("/:id/checklists", validateDTO(CreateChecklistItemDto), checklistController.addItem)
+router.get("/:id/checklists", checklistController.getItems)
+router.patch("/:id/checklists/:itemId", validateDTO(ToggleChecklistItemDto), checklistController.toggleItem)
+router.delete("/:id/checklists/:itemId", checklistController.deleteItem)
 
 export default router
