@@ -5,6 +5,7 @@ import { ProtectedRoute, PublicRoute } from "../routing";
 import { DashboardPage } from "../../modules/dashboard";
 import { LoginPage, RegisterPage } from "../../modules/auth";
 import { BuildingPage } from "../../modules/systems";
+import { ProjectDetailPage, ProjectListPage } from "../../modules/projects";
 
 export const router = createBrowserRouter([
   {
@@ -16,6 +17,8 @@ export const router = createBrowserRouter([
     ),
     children: [
       { path: "/", element: <DashboardPage /> },
+      { path: "/projects", element: <ProjectListPage /> },
+      { path: "/projects/:id", element: <ProjectDetailPage /> },
     ]
   },
   {
