@@ -42,7 +42,7 @@ export default function authMiddleware(req: AuthRequest, res: Response, next: Ne
             roles: decoded.roles || [],
         } as AuthRequest["user"]
         next()
-    } catch (error) {
+    } catch {
         return next(
             new ApiError(401, "Token không hợp lệ", "authorization", ["Token đã hết hạn hoặc không hợp lệ"])
         )
