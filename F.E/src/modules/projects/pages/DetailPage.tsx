@@ -7,6 +7,7 @@ import { Divider, Tabs } from "antd";
 import { ItemRow, LoadingPage, NotFoundPage } from "../../../core/layouts";
 import FormUpdate from "../components/FormUpdate";
 import { formatDate } from "../../../core/utils/formatDate";
+import { MemberPage } from "../../members";
 
 interface IProps {
     projectId?: string | null;
@@ -98,6 +99,11 @@ function DetailPage({ projectId }: IProps) {
                                 </div>
                             )
                         },
+                        {
+                            key: "members",
+                            label: "Thành viên",
+                            children: <MemberPage projectId={project._id} />
+                        }
                     ]}
                     onChange={(key) => {
                         setActiveTab(key);
