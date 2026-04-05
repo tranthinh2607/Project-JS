@@ -1,7 +1,7 @@
 import { Response, NextFunction } from "express"
 import service from "./auth.service"
 import { sendResponse } from "@core/utils/response"
-import { RegisterDto, LoginDto, UpdateProfileDto, ChangePasswordDto } from "./dto/auth.dto"
+import { RegisterDto, LoginDto } from "./dto/auth.dto"
 import { Request } from "@core/types/request"
 import ApiError from "@core/utils/apiError"
 

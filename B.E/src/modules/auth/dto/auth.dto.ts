@@ -18,6 +18,11 @@ export class RegisterDto {
 
     @IsEmail({}, { message: "Email không hợp lệ" })
     email!: string
+ 
+    @IsString({ message: "Name phải là chuỗi ký tự" })
+    @MinLength(3, { message: "Name phải có ít nhất 3 ký tự" })
+    @MaxLength(100, { message: "Name không được vượt quá 100 ký tự" })
+    name!: string
 
     @IsString({ message: "Password phải là chuỗi ký tự" })
     @MinLength(6, { message: "Password phải có ít nhất 6 ký tự" })
@@ -26,8 +31,10 @@ export class RegisterDto {
 }
 
 export class LoginDto {
-    @IsString({ message: "Username/Email phải là chuỗi ký tự" })
-    identifier!: string
+    @IsString({ message: "Username phải là chuỗi ký tự" })
+    @MinLength(3, { message: "Username phải có ít nhất 3 ký tự" })
+    @MaxLength(50, { message: "Username không được vượt quá 50 ký tự" })
+    username!: string
 
     @IsString({ message: "Password phải là chuỗi ký tự" })
     password!: string
@@ -43,6 +50,10 @@ export class UpdateProfileDto {
     @IsOptional()
     @IsEmail({}, { message: "Email không hợp lệ" })
     email?: string
+
+    @IsOptional()
+    @IsString({ message: "Name phải là chuỗi ký tự" })
+    name?: string
 
     @IsOptional()
     @IsUrl({}, { message: "Avatar URL không hợp lệ" })

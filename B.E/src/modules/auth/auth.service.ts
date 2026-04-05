@@ -3,13 +3,14 @@ import ApiError from "@core/utils/apiError"
 import { env } from "@core/config/env.config"
 import { RegisterDto, LoginDto, UpdateProfileDto, ChangePasswordDto } from "./dto/auth.dto"
 import jwt, { JwtPayload } from "jsonwebtoken"
+import mongoose from "mongoose"
 import { IUser, UserStatus } from "./auth.model"
 
 interface TokenPayload extends JwtPayload {
     userId: string
     username: string
     email: string
-    roles: string[]
+    roles: mongoose.Types.ObjectId[]
 }
 
 interface RefreshTokenPayload extends JwtPayload {
@@ -27,12 +28,14 @@ const generateTokens = (user: IUser): { accessToken: string, refreshToken: strin
     }
 
     const accessToken = jwt.sign(payload, env.jwt.secret, {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         expiresIn: env.jwt.expire_access as any,
     })
 
     const refreshToken = jwt.sign(
         { userId: user._id.toString(), type: "refresh" },
         env.jwt.secret,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         { expiresIn: env.jwt.expire_refresh as any }
     )
 
@@ -66,26 +69,25 @@ export default {
         // Generate tokens
         const result = generateTokens(user)
 
-        return { data: { ...result } }
+        return { data: { ...result, user } }
     },
 
     async login(dto: LoginDto) {
-        // Find user by username or email
-        const user = await repo.findByIdentifier(dto.identifier)
+        // Validate user exists
+        const user = await this.validateUserExists(dto.username)
+        if (user instanceof ApiError) return user
 
-        // Always perform password check to prevent timing attack
-        // If user doesn't exist, use a dummy hash to ensure consistent timing
-        const passwordToCompare = user ? dto.password : "dummy_password_for_timing_attack_prevention"
-        const isPasswordValid = await user?.comparePassword(passwordToCompare) ?? false
-
-        if (!isPasswordValid || !user) {
-            return new ApiError(401, "Thông tin đăng nhập không chính xác", "credentials", [
-                "Tên đăng nhập hoặc mật khẩu không đúng",
+        // Validate password
+        const isPasswordValid = await this.validatePassword(user, dto.password)
+        if (!isPasswordValid) {
+            return new ApiError(401, "Thông tin đăng nhập không chính xác", "password", [
+                "Mật khẩu không đúng",
             ])
         }
 
-        // Check user status
-        if (user.status !== UserStatus.ACTIVE) {
+        // Validate user status
+        const isActive = this.validateUserStatus(user)
+        if (!isActive) {
             return new ApiError(403, "Tài khoản bị vô hiệu hóa", "status", [
                 "Tài khoản của bạn đã bị vô hiệu hóa",
             ])
@@ -95,6 +97,26 @@ export default {
         const result = generateTokens(user)
 
         return { data: result }
+    },
+
+    async validateUserExists(username: string): Promise<IUser | ApiError> {
+        const user = await repo.findByUsername(username)
+        if (!user) {
+            return new ApiError(401, "Thông tin đăng nhập không chính xác", "username", [
+                "Username không đúng",
+            ])
+        }
+        return user
+    },
+
+    async validatePassword(user: IUser, password: string): Promise<boolean> {
+        // Use dummy password for non-existent user to prevent timing attack
+        const passwordToCompare = password || "dummy_password_for_timing_attack_prevention"
+        return await user.comparePassword(passwordToCompare)
+    },
+
+    validateUserStatus(user: IUser): boolean {
+        return user.status === UserStatus.ACTIVE
     },
 
     async getProfile(userId: string) {
@@ -188,11 +210,9 @@ export default {
             }
 
             const user = await repo.findById(decoded.userId)
-            if (!user) {
-                return new ApiError(404, "Không tìm thấy người dùng", "user", [
-                    "Người dùng không tồn tại",
-                ])
-            }
+            if (!user) return new ApiError(404, "Không tìm thấy người dùng", "user", [
+                "Người dùng không tồn tại",
+            ])
 
             if (user.status !== UserStatus.ACTIVE) {
                 return new ApiError(403, "Tài khoản bị vô hiệu hóa", "status", [
@@ -202,7 +222,7 @@ export default {
 
             const result = generateTokens(user)
             return { data: result }
-        } catch (error) {
+        } catch {
             return new ApiError(401, "Token không hợp lệ", "token", [
                 "Refresh token đã hết hạn hoặc không hợp lệ",
             ])
