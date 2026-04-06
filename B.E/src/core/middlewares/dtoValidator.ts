@@ -4,10 +4,11 @@ import { validate } from "class-validator"
 import ApiError from "../utils/apiError"
 import { Request } from "@core/types/request"
 
-export default function validateDTO(dtoClass: any) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default function validateDTO(dtoClass: any, source: "body" | "query" = "body") {
     return async (req: Request, res: Response, next: NextFunction) => {
-
-        const dto = plainToInstance(dtoClass, req.body, {
+        const data = source === "query" ? req.query : req.body
+        const dto = plainToInstance(dtoClass, data, {
             enableImplicitConversion: true
         })
 

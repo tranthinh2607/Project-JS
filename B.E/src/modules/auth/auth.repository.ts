@@ -57,8 +57,8 @@ export default {
             const user = new User({
                 username: data.username,
                 email: data.email.toLowerCase(),
+                name: data.name,
                 password: data.password,
-                roles: ["user"],
                 providers: [{ provider: "local", providerId: null }],
                 status: UserStatus.ACTIVE,
             })
@@ -76,8 +76,8 @@ export default {
 
             if (data.username !== undefined) updateData.username = data.username
             if (data.email !== undefined) updateData.email = data.email.toLowerCase()
+            if (data.name !== undefined) updateData.name = data.name
             if (data.avatar !== undefined) updateData.avatar = data.avatar
-            if (data.roles !== undefined) updateData.roles = data.roles
             if (data.status !== undefined) updateData.status = data.status
 
             const user = await User.findByIdAndUpdate(id, updateData, { new: true }).exec()
@@ -90,12 +90,11 @@ export default {
 
     async updatePassword(id: string, newPassword: string): Promise<IUser | null> {
         try {
-            const user = await User.findByIdAndUpdate(
-                id,
-                { password: newPassword },
-                { new: true }
-            ).exec()
-            return user
+            const user = await User.findById(id)
+            if (!user) return null
+
+            user.password = newPassword
+            return await user.save()
         } catch (error) {
             logger.error("Error updating password", { id, error })
             throw error

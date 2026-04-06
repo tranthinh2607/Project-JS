@@ -1,0 +1,97 @@
+@import "tailwindcss";
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+@theme {
+  --color-bg: #fff;
+  --color-primary: #2196f3;
+  --color-primary-hover: #1976d2;
+  --color-danger: #ff4d4f;
+}
+
+body {
+  font-family:
+    -apple-system,
+    system-ui,
+    BlinkMacSystemFont,
+    Segoe UI,
+    Helvetica,
+    Arial,
+    sans-serif,
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    Segoe UI Symbol !important;
+  font-weight: 400 !important;
+  font-style: normal;
+  font-size: 13px;
+}
+
+p {
+  font-size: 13px;
+  margin: 0;
+}
+
+table {
+  font-size: 13px !important;
+}
+
+button {
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 13px !important;
+}
+
+input::placeholder,
+input {
+  font-size: 13px !important;
+}
+
+
+.content-scroll-tabs {
+  overflow-y: auto;
+  height: calc(100vh - 270px);
+}
+
+.content-scroll {
+  overflow-y: auto;
+  height: calc(100vh - 220px);
+}
+
+.title-module {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.hide-scrollbar {
+  position: relative;
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE và Edge cũ */
+
+  overflow: auto;
+  /* đảm bảo vẫn scroll */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, Opera */
+}
+
+.recharts-wrapper svg {
+  pointer-events: none !important;
+  outline: none !important;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px white inset;
+  -webkit-text-fill-color: #000;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.ant-table-wrapper .ant-table-cell {
+  padding: 8px 16px !important;
+}
