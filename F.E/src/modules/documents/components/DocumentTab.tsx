@@ -171,6 +171,7 @@ function DocumentTab({ projectId }: IProps) {
 
         <Upload
           showUploadList={false}
+          accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,image/*"
           beforeUpload={(file) => {
             uploadMutate({ projectId, file });
             return false;
