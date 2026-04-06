@@ -73,17 +73,6 @@ function Sidebar({ isOpen, onToggle }: SidebarProps) {
               icon: <DocumentTextIcon className="w-4 h-4" />,
               label: "Công việc",
             },
-            {
-              key: "members",
-              icon: <UserGroupIcon className="w-4 h-4" />,
-              label: "Thành viên",
-            },
-            {
-              key: "settings",
-              icon: <Cog6ToothIcon className="w-4 h-4" />,
-              label: "Thiết lập hệ thống",
-            },
-
           ]}
           // onClick={handleMenuClick}
           className="border-none"

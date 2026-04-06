@@ -39,5 +39,37 @@ export const useAuthQuery = {
       },
     });
   },
-
+  useUpdateProfileInfo(onSuccess?: (data: ApiResponse) => void, onError?: (error: ApiResponse) => void) {
+    return useMutation({
+      mutationFn: async (payload: any) => {
+        const res = await api.updateProfile(payload);
+        if (res.status === 200) return res;
+        throw res;
+      },
+      onSuccess,
+      onError,
+    });
+  },
+  useChangePassword(onSuccess?: (data: ApiResponse) => void, onError?: (error: ApiResponse) => void) {
+    return useMutation({
+      mutationFn: async (payload: any) => {
+        const res = await api.changePassword(payload);
+        if (res.status === 200) return res;
+        throw res;
+      },
+      onSuccess,
+      onError,
+    });
+  },
+  useGoogleLogin(onSuccess?: (data: ApiResponse) => void, onError?: (error: ApiResponse) => void) {
+    return useMutation({
+      mutationFn: async (token: string) => {
+        const res = await api.googleLogin(token);
+        if (res.status === 200) return res;
+        throw res;
+      },
+      onSuccess,
+      onError,
+    });
+  },
 };

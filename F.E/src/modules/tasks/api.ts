@@ -16,6 +16,18 @@ export const api = {
       throw error;
     }
   },
+  getAll: async (params: IParams) => {
+    try {
+      const res = await axiosTaskFlowClient<ApiResponse<ITask[]>>({
+        method: "GET",
+        url: `${moduleName}`,
+        params,
+      });
+      return res.data;
+    } catch (error) {
+      throw error;
+    }
+  },
   getById: async (id: string) => {
     try {
       const res = await axiosTaskFlowClient<ApiResponse<ITask>>({

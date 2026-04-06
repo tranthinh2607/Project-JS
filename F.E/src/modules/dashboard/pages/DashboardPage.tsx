@@ -2,9 +2,10 @@ import { ArrowUpIcon, ChartBarIcon, ChevronRightIcon, CubeIcon, ShoppingBagIcon,
 import dayjs, { type Dayjs } from "dayjs";
 import "dayjs/plugin/quarterOfYear";
 import { useState } from "react";
-import { Select, Steps } from "antd";
+import { Select, Steps, Empty } from "antd";
 import { RevenueChart } from "../components";
 import { formatVND } from "../../../core/utils/formatVND";
+import { useDashboardQuery } from "../useQuery";
 
 type ActivityType = "task" | "system" | "project";
 
@@ -70,50 +71,21 @@ function DashboardPage() {
         { label: "Hệ thống", value: "system" },
     ];
 
-    const activities = [
-        {
-            key: 1,
-            title: "Công việc hoàn thành",
-            description: 'Task "Thiết kế UI Dashboard" đã được hoàn thành bởi @admin',
-            time: '2 phút trước',
-            type: "task" as const,
-        },
-        {
-            key: 2,
-            title: "Dự án mới",
-            description: 'Dự án "Tối ưu hóa quy trình" đã được khởi tạo',
-            time: '15 phút trước',
-            type: "project" as const,
-        },
-        {
-            key: 3,
-            title: "Thành viên mới",
-            description: '@thinh.nguyen đã tham gia vào hệ thống',
-            time: '1 giờ trước',
-            type: "system" as const,
-        },
-        {
-            key: 4,
-            title: "Cập nhật tiến độ",
-            description: 'Dự án "Quản lý gara" đạt 75% khối lượng công việc',
-            time: '3 giờ trước',
-            type: "project" as const,
-        },
-        {
-            key: 5,
-            title: "Nhắc nhở công việc",
-            description: 'Task "Kiểm tra bug login" sắp đến hạn (DL: 18:00)',
-            time: '5 giờ trước',
-            type: "task" as const,
-        },
-    ];
-
-    // Mock Statistics
-    const stats = {
-        active_projects: 12,
-        tasks_completed: 156,
-        efficiency: "94%",
+    // Hook fetching data
+    const queryParams = {
+        startDate: range ? range[0].toISOString() : undefined,
+        endDate: range ? range[1].toISOString() : undefined,
     };
+    const { data: dashboardData, isLoading } = useDashboardQuery.useGetStatistics(queryParams);
+
+    const stats = {
+        active_projects: dashboardData?.data?.active_projects ?? dashboardData?.active_projects ?? 0,
+        tasks_completed: dashboardData?.data?.tasks_completed ?? dashboardData?.tasks_completed ?? 0,
+        total_members: dashboardData?.data?.total_members ?? dashboardData?.total_members ?? 0,
+    };
+
+    // Hoạt động mới nhất để sau
+    const activities: any[] = [];
 
     const cardFilter = [
         {
@@ -129,9 +101,9 @@ function DashboardPage() {
             icon: <CheckCircleIcon className="w-5 h-5" />,
         },
         {
-            title: "Hiệu suất nhóm",
+            title: "Tổng thành viên",
             key: 3,
-            value: stats.efficiency,
+            value: stats.total_members,
             icon: <UsersIcon className="w-5 h-5" />,
         },
     ];
@@ -146,7 +118,7 @@ function DashboardPage() {
                         </h3>
                         <p className="text-sm text-gray-500">Chào mừng trở lại! Dưới đây là tóm tắt công việc của bạn.</p>
                     </div>
-                    <Select
+                    {/* <Select
                         placeholder="Chọn thời gian"
                         style={{ width: 140 }}
                         value={DATE_PRESETS.find((i) => i?.range === range)?.value}
@@ -156,7 +128,7 @@ function DashboardPage() {
                         }))}
                         onChange={handleChange}
                         className="custom-select"
-                    />
+                    /> */}
                 </div>
 
                 {/* Metric Cards */}
@@ -170,7 +142,6 @@ function DashboardPage() {
                                 <div className="space-y-2">
                                     <p className="text-sm font-medium text-gray-500">{item.title}</p>
                                     <h2 className="text-3xl font-extrabold text-gray-800">{item.value}</h2>
-                                    <p className="text-xs text-green-600 font-medium">{item.trend}</p>
                                 </div>
                                 <div className="p-3 bg-primary/5 rounded-xl group-hover:bg-primary/10 transition-colors text-primary">
                                     {item.icon}
@@ -214,7 +185,7 @@ function DashboardPage() {
                     </div> */}
 
                     {/* Activity History */}
-                    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 overflow-hidden">
+                    {/* <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 overflow-hidden">
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="font-bold text-gray-800">Hoạt động mới nhất</h3>
                             <div className="p-1 hover:bg-gray-100 rounded-md cursor-pointer transition-colors">
@@ -222,40 +193,46 @@ function DashboardPage() {
                             </div>
                         </div>
                         <div className="relative">
-                            <Steps
-                                items={activities.map((item) => {
-                                    const config = ACTIVITY_CONFIG[item.type as ActivityType] || ACTIVITY_CONFIG.system;
-                                    return {
-                                        icon: <></>,
-                                        title: (
-                                            <div className="flex items-start gap-3 -ml-11">
-                                                <div className={`p-2 rounded-lg ${config.bgColor} ${config.color} shadow-sm group-hover:scale-110 transition-transform`}>
-                                                    {config.icon}
-                                                </div>
-                                                <div className="flex flex-col mb-4">
-                                                    <div className="flex justify-between items-center w-full">
-                                                        <span className="text-xs font-bold text-gray-800 uppercase tracking-wider">{item.title}</span>
-                                                        <span className="text-[10px] text-gray-400 font-medium">{item.time}</span>
+                            {activities.length > 0 ? (
+                                <Steps
+                                    items={activities.map((item: any) => {
+                                        const config = ACTIVITY_CONFIG[item.type as ActivityType] || ACTIVITY_CONFIG.system;
+                                        return {
+                                            icon: <></>,
+                                            title: (
+                                                <div className="flex items-start gap-3 -ml-11">
+                                                    <div className={`p-2 rounded-lg ${config.bgColor} ${config.color} shadow-sm group-hover:scale-110 transition-transform`}>
+                                                        {config.icon}
                                                     </div>
-                                                    <span className="text-sm text-gray-600 leading-tight mt-1 line-clamp-2">{item.description}</span>
+                                                    <div className="flex flex-col mb-4">
+                                                        <div className="flex justify-between items-center w-full">
+                                                            <span className="text-xs font-bold text-gray-800 uppercase tracking-wider">{item.title}</span>
+                                                            <span className="text-[10px] text-gray-400 font-medium">{item.time}</span>
+                                                        </div>
+                                                        <span className="text-sm text-gray-600 leading-tight mt-1 line-clamp-2">{item.description}</span>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        ),
-                                        description: '',
-                                        status: "process",
-                                    };
-                                })}
-                                size="small"
-                                direction="vertical"
-                                current={1}
-                                className="custom-steps"
-                            />
+                                            ),
+                                            description: '',
+                                            status: "process",
+                                        };
+                                    })}
+                                    size="small"
+                                    direction="vertical"
+                                    current={1}
+                                    className="custom-steps"
+                                />
+                            ) : (
+                                <div className="py-4 opacity-70">
+                                    <Empty description="Không có hoạt động nào trong khoảng thời gian này" image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                                </div>
+                            )}
                             <button className="w-full mt-2 py-2 text-sm text-primary font-bold hover:bg-primary/5 rounded-lg transition-all flex items-center justify-center gap-1 group">
                                 Xem tất cả lịch sử
                                 <ChevronRightIcon className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                             </button>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </div>

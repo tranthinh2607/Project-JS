@@ -1,5 +1,5 @@
 import axios, { type AxiosInstance } from "axios";
-import { getAccessToken } from "./cookies";
+import { getAccessToken, clearTokens } from "./cookies";
 
 // Yopos
 const urlSVTaskFlow = import.meta.env.VITE_API_TASK_FLOW_URL;
@@ -22,8 +22,10 @@ const createAxiosClient = (baseURL: string): AxiosInstance => {
     (response) => response,
     (error) => {
       if (error.response && error.response.status === 401) {
-        // clearTokens();
-        // if (window.location.pathname !== "/token-expired") window.location.href = "/token-expired";
+        clearTokens();
+        if (window.location.pathname !== "/token-expired" && window.location.pathname !== "/login") {
+            window.location.href = "/token-expired";
+        }
       }
       return error.response;
     }

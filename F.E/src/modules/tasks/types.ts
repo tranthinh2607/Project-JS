@@ -4,6 +4,12 @@ interface IAssignee {
   avatar?: string;
 }
 
+interface IProjectInfo {
+  _id: string;
+  title: string;
+  code: string;
+}
+
 interface IChecklistItem {
   _id: string;
   title: string;
@@ -37,6 +43,8 @@ interface ITask {
   created_by: string;
   created_name?: string;
   assignees: IAssignee[];
+  project_info?: IProjectInfo;
+  project_name?: string;
   subtask_count?: number;
   subtasks?: ITask[];
   children?: ITask[];
@@ -59,6 +67,9 @@ interface IParams {
   limit?: number;
   keyword?: string;
   priority?: string;
+  status?: string;
+  project_id?: string;
+  type?: "all" | "assigned" | "mine";
 }
 
 export type { ITask, IAssignee, IPayload, IParams, IChecklistItem, IStatusHistory };

@@ -5,12 +5,14 @@ import { RegisterDto, LoginDto, UpdateProfileDto, ChangePasswordDto } from "./dt
 import jwt, { JwtPayload } from "jsonwebtoken"
 import mongoose from "mongoose"
 import { IUser, UserStatus } from "./auth.model"
+import { OAuth2Client } from "google-auth-library"
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 
 interface TokenPayload extends JwtPayload {
     userId: string
     username: string
     email: string
-    roles: mongoose.Types.ObjectId[]
 }
 
 interface RefreshTokenPayload extends JwtPayload {
@@ -24,7 +26,6 @@ const generateTokens = (user: IUser): { accessToken: string, refreshToken: strin
         userId: user._id.toString(),
         username: user.username,
         email: user.email,
-        roles: user.roles,
     }
 
     const accessToken = jwt.sign(payload, env.jwt.secret, {
@@ -177,26 +178,85 @@ export default {
             ])
         }
 
-        // Check old password
-        const isPasswordValid = await user.comparePassword(dto.oldPassword)
-        if (!isPasswordValid) {
-            return new ApiError(400, "Mật khẩu cũ không chính xác", "oldPassword", [
-                "Mật khẩu cũ không đúng",
-            ])
-        }
+        if (user.password && dto.oldPassword) {
+            // Check old password
+            const isPasswordValid = await user.comparePassword(dto.oldPassword)
+            if (!isPasswordValid) {
+                return new ApiError(400, "Mật khẩu cũ không chính xác", "oldPassword", [
+                    "Mật khẩu cũ không đúng",
+                ])
+            }
 
-        // Check if new password is same as old
-        const isSamePassword = await user.comparePassword(dto.newPassword)
-        if (isSamePassword) {
-            return new ApiError(400, "Mật khẩu mới phải khác mật khẩu cũ", "newPassword", [
-                "Vui lòng chọn mật khẩu khác mật khẩu cũ",
-            ])
+            // Check if new password is same as old
+            const isSamePassword = await user.comparePassword(dto.newPassword)
+            if (isSamePassword) {
+                return new ApiError(400, "Mật khẩu mới phải khác mật khẩu cũ", "newPassword", [
+                    "Vui lòng chọn mật khẩu khác mật khẩu cũ",
+                ])
+            }
         }
 
         // Update password
         await repo.updatePassword(userId, dto.newPassword)
 
         return { data: { message: "Đổi mật khẩu thành công" } }
+    },
+
+    async googleLogin(token: string) {
+        try {
+            // Verify Google token
+            const ticket = await client.verifyIdToken({
+                idToken: token,
+                audience: process.env.GOOGLE_CLIENT_ID,
+            })
+            const payload = ticket.getPayload()
+            if (!payload || !payload.email) {
+                return new ApiError(401, "Xác thực Google thất bại", "google", [
+                    "Không thể lấy thông tin từ Google",
+                ])
+            }
+
+            const { email, name, sub: googleId, picture: avatar } = payload
+
+            // Check if user exists by email
+            let user = await repo.findByEmail(email)
+
+            if (!user) {
+                // Register new user via Google
+                user = await repo.create({
+                    username: email.split("@")[0] + "_" + Math.random().toString(36).slice(-4),
+                    email: email,
+                    name: name || email.split("@")[0],
+                    password: "", // Handled as null/empty
+                })
+                
+                // Update provider info
+                await repo.update(user._id.toString(), {
+                    // @ts-ignore
+                    providers: [{ provider: "google", providerId: googleId }],
+                    avatar: avatar,
+                })
+            } else {
+                // User exists, ensure google provider is linked
+                const hasGoogleProvider = user.providers.some(p => p.provider === "google")
+                if (!hasGoogleProvider) {
+                    await repo.update(user._id.toString(), {
+                        // @ts-ignore
+                        providers: [...user.providers, { provider: "google", providerId: googleId }],
+                        avatar: user.avatar || avatar,
+                    })
+                }
+            }
+
+            // Generate app tokens
+            const result = generateTokens(user)
+            return { data: { ...result, user } }
+        } catch (error) {
+            console.error("Google Login Error:", error)
+            return new ApiError(401, "Token Google không hợp lệ", "google", [
+                "Xác thực Google không thành công",
+            ])
+        }
     },
 
     async refreshToken(refreshToken: string) {

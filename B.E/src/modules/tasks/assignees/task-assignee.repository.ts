@@ -40,5 +40,9 @@ export default {
                 }
             }
         ])
+    },
+
+    async findByUser(userId: string) {
+        return await TaskAssignee.find({ user_id: new mongoose.Types.ObjectId(userId) }).lean()
     }
 }

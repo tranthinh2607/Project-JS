@@ -6,6 +6,7 @@ import { Task } from "./tasks.model"
 import projectRepo from "@modules/projects/projects.repository"
 import memberRepo from "@modules/project-members/project-members.repository"
 import { User } from "@modules/auth/auth.model"
+import assigneeRepo from "./assignees/task-assignee.repository"
 
 export default {
     async createTask(dto: CreateTaskDto, userId: string) {
@@ -104,5 +105,59 @@ export default {
 
         await repo.deleteWithSubtasks(taskId)
         return { data: null }
+    },
+
+    async getTasks(userId: string, query: any) {
+        const page = parseInt(query.page || "1")
+        const limit = parseInt(query.limit || "10")
+        const skip = (page - 1) * limit
+
+        let projectIds: mongoose.Types.ObjectId[] | undefined = undefined
+        let assignedTaskIds: mongoose.Types.ObjectId[] | undefined = undefined
+        let createdBy: mongoose.Types.ObjectId | undefined = undefined
+
+        if (query.type === "assigned") {
+            const assignments = await assigneeRepo.findByUser(userId)
+            assignedTaskIds = assignments.map(a => a.task_id)
+        } else if (query.type === "mine") {
+            createdBy = new mongoose.Types.ObjectId(userId)
+        } else {
+            // Default: All tasks in projects the user is involved in + assigned + created
+            const user = await User.findById(userId)
+            const projectsAsMember = await memberRepo.findByEmail(user?.email || "")
+            const projectsAsOwner = await projectRepo.findByOwner(userId)
+            
+            projectIds = [
+                ...projectsAsMember.map((p: any) => new mongoose.Types.ObjectId(p.project_id)),
+                ...projectsAsOwner.map((p: any) => new mongoose.Types.ObjectId(p._id))
+            ]
+
+            const assignments = await assigneeRepo.findByUser(userId)
+            assignedTaskIds = assignments.map((a: any) => a.task_id)
+            
+            createdBy = new mongoose.Types.ObjectId(userId)
+        }
+
+        const result = await repo.findTasks({
+            projectIds,
+            assignedTaskIds,
+            createdBy,
+            keyword: query.keyword,
+            priority: query.priority,
+            status: query.status,
+            projectId: query.project_id,
+            skip,
+            limit
+        })
+
+        return {
+            data: result.tasks,
+            pagination: {
+                totalRow: result.total,
+                page,
+                limit,
+                totalPage: Math.ceil(result.total / limit)
+            }
+        }
     }
 }

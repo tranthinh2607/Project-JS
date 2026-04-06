@@ -60,22 +60,23 @@ export class UpdateProfileDto {
     avatar?: string
 
     @IsOptional()
-    @IsArray({ message: "Roles phải là mảng" })
-    @IsString({ each: true, message: "Mỗi role phải là chuỗi ký tự" })
-    roles?: string[]
-
-    @IsOptional()
     @IsEnum(UserStatus, { message: "Status không hợp lệ" })
     status?: UserStatus
 }
 
 export class ChangePasswordDto {
+    @IsOptional()
     @IsString({ message: "Password cũ phải là chuỗi ký tự" })
     @MinLength(6, { message: "Password cũ phải có ít nhất 6 ký tự" })
-    oldPassword!: string
+    oldPassword?: string
 
     @IsString({ message: "Password mới phải là chuỗi ký tự" })
     @MinLength(6, { message: "Password mới phải có ít nhất 6 ký tự" })
     @MaxLength(100, { message: "Password mới không được vượt quá 100 ký tự" })
     newPassword!: string
+}
+
+export class GoogleLoginDto {
+    @IsString({ message: "Token phải là chuỗi ký tự" })
+    token!: string
 }

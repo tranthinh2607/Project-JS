@@ -23,6 +23,7 @@ interface IProps {
     page: number;
     limit: number;
     totalRow: number;
+    totalPages?: number;
   } | null;
   onChangePage: (page: number, pageSize: number) => void;
   isLoading?: boolean;
@@ -31,7 +32,8 @@ interface IProps {
   onCreateSubTask?: (record: ITask) => void;
   moduleKeyName: string;
   keyword?: string;
-  projectId: string;
+  projectId?: string;
+  showProjectColumn?: boolean;
 }
 
 function ListItems({
@@ -45,6 +47,7 @@ function ListItems({
   moduleKeyName,
   keyword,
   projectId,
+  showProjectColumn = false,
 }: IProps) {
   const [treeData, setTreeData] = useState<ITask[]>([]);
 
@@ -52,7 +55,7 @@ function ListItems({
     () => toast.success("Cập nhật trạng thái thành công"),
     (error) => handleToastMessageErrors(error)
   );
-  
+
   const { mutate: assignUser } = useTasksQuery.useAssign(
     () => toast.success("Giao việc thành công"),
     (error) => handleToastMessageErrors(error)
@@ -118,6 +121,20 @@ function ListItems({
         </span>
       ),
     },
+    ...(showProjectColumn
+      ? [
+        {
+          title: "Dự án",
+          key: "project",
+          width: 150,
+          render: (_: any, record: ITask) => (
+            <span className="text-gray-600 font-medium">
+              {record.project_name || "---"}
+            </span>
+          ),
+        },
+      ]
+      : []),
     {
       title: "Người thực hiện",
       key: "assignees",
@@ -125,7 +142,7 @@ function ListItems({
       render: (_, record) => (
         <AssigneeCell
           data={record.assignees || []}
-          projectId={projectId}
+          projectId={record.project_id}
           taskId={record._id}
           moduleKeyName={moduleKeyName}
           handleAddAssignee={(userId) => assignUser({ taskId: record._id, userIds: [userId] })}
@@ -182,7 +199,7 @@ function ListItems({
       fixed: "right",
       render: (_, record) => (
         <div className="flex items-center justify-center gap-1">
-          <Button
+          {/* <Button
             module_name={moduleKeyName}
             action="create"
             variant="transaction"
@@ -192,7 +209,7 @@ function ListItems({
             <Tooltip title="Thêm nhiệm vụ con">
               <PlusIcon className="w-4 h-4 mx-auto" />
             </Tooltip>
-          </Button>
+          </Button> */}
           <Popconfirm
             title="Xoá nhiệm vụ"
             description="Bạn có chắc muốn xoá nhiệm vụ này?"
@@ -218,8 +235,8 @@ function ListItems({
   ];
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="overflow-hidden">
+    <div className="flex flex-col gap-2 h-full">
+      <div className="overflow-hidden flex-1">
         <div className="overflow-x-auto">
           <Table
             loading={isLoading}
@@ -232,17 +249,15 @@ function ListItems({
         </div>
       </div>
 
-      {pagination && pagination.totalRow > pagination.limit && (
-        <div className="flex justify-end">
-          <Pagination
-            current={pagination.page}
-            pageSize={pagination.limit}
-            total={pagination.totalRow}
-            onChange={onChangePage}
-            showSizeChanger={false}
-          />
-        </div>
-      )}
+      <div className="flex justify-end">
+        <Pagination
+          current={pagination?.page}
+          pageSize={pagination?.limit}
+          total={pagination?.totalRow}
+          onChange={onChangePage}
+          showSizeChanger={false}
+        />
+      </div>
     </div>
   );
 }

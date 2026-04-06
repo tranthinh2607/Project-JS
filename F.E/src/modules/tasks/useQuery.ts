@@ -14,6 +14,12 @@ export const useTasksQuery = {
       enabled: !!projectId,
     });
   },
+  useGetAll(params: IParams) {
+    return useQuery({
+      queryKey: [moduleName, "all", params],
+      queryFn: async () => await api.getAll(params),
+    });
+  },
   useGetById(id: string) {
     return useQuery({
       queryKey: [moduleName, id],

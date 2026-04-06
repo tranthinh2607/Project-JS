@@ -1,14 +1,14 @@
 import { axiosTaskFlowClient, type ApiResponse } from "../../core/utils/axiosClient";
-import type { IDashboardStatistics } from "./types";
 
 const moduleName = "dashboard";
 
 export const api = {
-  getStatistics: async () => {
+  getStatistics: async (params?: { startDate?: string; endDate?: string }) => {
     try {
-      const res = await axiosTaskFlowClient<ApiResponse<IDashboardStatistics>>({
+      const res = await axiosTaskFlowClient<ApiResponse<any>>({
         method: "GET",
-        url: `${moduleName}/statistics`,
+        url: `${moduleName}`,
+        params,
       });
       return res.data;
     } catch (error) {

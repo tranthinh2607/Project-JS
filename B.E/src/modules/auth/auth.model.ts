@@ -17,10 +17,9 @@ export interface IUser {
     username: string
     email: string
     name: string
-    password: string
+    password?: string | null
     avatar?: string | null
     status: UserStatus
-    roles: mongoose.Types.ObjectId[]
     providers: IProvider[]
     createdAt?: Date
     updatedAt?: Date
@@ -53,7 +52,7 @@ const UserSchema = new Schema<IUser>({
     },
     password: {
         type: String,
-        required: true,
+        default: null,
     },
     avatar: {
         type: String,
@@ -64,10 +63,6 @@ const UserSchema = new Schema<IUser>({
         enum: Object.values(UserStatus),
         default: UserStatus.ACTIVE,
     },
-    roles: [{
-        type: Schema.Types.ObjectId,
-        ref: "Role",
-    }],
     providers: {
         type: [ProviderSchema],
         default: [{ provider: "local", providerId: null }],
@@ -81,7 +76,7 @@ UserSchema.index({ "providers.provider": 1, "providers.providerId": 1 })
 
 // Hash password before saving
 UserSchema.pre("save", async function (next) {
-    if (!this.isModified("password")) return next()
+    if (!this.isModified("password") || !this.password) return next()
 
     try {
         const salt = await bcrypt.genSalt(10)
@@ -102,6 +97,8 @@ UserSchema.methods.comparePassword = async function (
 // Transform output to remove sensitive fields
 UserSchema.set("toJSON", {
     transform: function (_doc, ret) {
+        // @ts-ignore
+        ret.hasPassword = !!ret.password
         // @ts-ignore
         delete ret.password
         return ret

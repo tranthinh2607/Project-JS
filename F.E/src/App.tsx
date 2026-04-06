@@ -10,26 +10,32 @@ import "./core/css/customs-menu-antd.css";
 import "./core/css/customs-tabs-antd.css";
 import { ConfigProvider } from "antd";
 
-function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <ConfigProvider
-        theme={{
-          token: {
-            colorPrimary: "#C9A85D",
-          },
-          components: {
-            Menu: {
-              itemSelectedBg: "transparent",
-            },
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
-          },
-        }}
-      >
-        <Toaster position="top-center" reverseOrder={false} />
-        <RouterProvider router={router} />
-      </ConfigProvider>
-    </QueryClientProvider>
+function App() {
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
+
+  return (
+    <GoogleOAuthProvider clientId={googleClientId}>
+      <QueryClientProvider client={queryClient}>
+        <ConfigProvider
+          theme={{
+            token: {
+              colorPrimary: "#2196f3",
+            },
+            components: {
+              Menu: {
+                itemSelectedBg: "transparent",
+              },
+
+            },
+          }}
+        >
+          <Toaster position="top-center" reverseOrder={false} />
+          <RouterProvider router={router} />
+        </ConfigProvider>
+      </QueryClientProvider>
+    </GoogleOAuthProvider>
   );
 }
 

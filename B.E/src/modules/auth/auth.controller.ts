@@ -1,7 +1,7 @@
 import { Response, NextFunction } from "express"
 import service from "./auth.service"
 import { sendResponse } from "@core/utils/response"
-import { RegisterDto, LoginDto } from "./dto/auth.dto"
+import { RegisterDto, LoginDto, GoogleLoginDto } from "./dto/auth.dto"
 import { Request } from "@core/types/request"
 import ApiError from "@core/utils/apiError"
 
@@ -95,22 +95,19 @@ export default {
         }
     },
 
-    async refreshToken(req: Request, res: Response, next: NextFunction) {
+    async googleLogin(req: Request<GoogleLoginDto>, res: Response, next: NextFunction) {
         try {
-            const { refreshToken } = req.body
-            if (!refreshToken) {
-                return sendResponse(res, 401, "Unauthorized", null, [{ field: "authorization", messages: ["Vui lòng đăng nhập"] }])
-            }
-
-            const result = await service.refreshToken(refreshToken)
+            const dto = req.dto!
+            const result = await service.googleLogin(dto.token)
 
             if (result instanceof ApiError) {
                 return sendResponse(res, result.status, result.message, null, result.errors)
             }
 
-            return sendResponse(res, 200, "Làm mới token thành công", result)
+            return sendResponse(res, 200, "Đăng nhập Google thành công", result)
         } catch (error) {
             next(error)
         }
     },
+
 }

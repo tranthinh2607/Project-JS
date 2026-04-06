@@ -53,3 +53,33 @@ export class UpdateTaskDto {
     @IsOptional()
     due_date?: string
 }
+
+export class GetTasksDto {
+    @IsOptional()
+    @IsString()
+    page?: string
+
+    @IsOptional()
+    @IsString()
+    limit?: string
+
+    @IsOptional()
+    @IsMongoId()
+    project_id?: string
+
+    @IsOptional()
+    @IsString()
+    keyword?: string
+
+    @IsOptional()
+    @IsEnum(TaskPriority)
+    priority?: TaskPriority
+
+    @IsOptional()
+    @IsString()
+    status?: string
+
+    @IsOptional()
+    @IsString()
+    type?: "all" | "assigned" | "mine"
+}

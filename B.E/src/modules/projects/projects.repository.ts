@@ -1,6 +1,5 @@
 import { IProject, Project } from "./projects.model"
 import { CreateProjectDto, UpdateProjectDto } from "./dto/projects.dto"
-import { Counter } from "@core/database/counter.model"
 
 export default {
     async generateProjectCode(): Promise<string> {
@@ -8,16 +7,14 @@ export default {
         const year = now.getFullYear().toString().slice(-2)
         const month = (now.getMonth() + 1).toString().padStart(2, "0")
         const yearMonth = `${year}${month}` // e.g., "2604"
-        const counterName = `projects_${yearMonth}`
+        const prefix = `PJ${yearMonth}`
 
-        const counter = await Counter.findOneAndUpdate(
-            { name: counterName },
-            { $inc: { seq: 1 } },
-            { new: true, upsert: true }
-        )
-
-        const seq = counter.seq.toString().padStart(5, "0") // 5 digits, e.g., "00001"
-        return `PJ${yearMonth}${seq}`
+        // Find how many projects already have this prefix
+        const count = await Project.countDocuments({ code: { $regex: `^${prefix}` } })
+        
+        // Next sequence
+        const seq = (count + 1).toString().padStart(5, "0") // 5 digits, e.g., "00001"
+        return `${prefix}${seq}`
     },
 
     async create(data: CreateProjectDto & { owner_id: string }): Promise<IProject> {

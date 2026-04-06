@@ -1,4 +1,5 @@
 import { Checkbox, Form, Input } from "antd";
+import { GoogleLogin } from "@react-oauth/google";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import FieldError, { setErrorForm, type errors } from "../../../core/layouts/FieldError";
@@ -28,7 +29,18 @@ function LoginPage() {
             form.setFields(setErrorForm(error?.errors || []))
         }
     );
-    useLoadingToast(isPending, "Đang đăng nhập...", "login-loading");
+    const { mutate: googleLoginMutate, isPending: isGooglePending } = useAuthQuery.useGoogleLogin(
+        (res) => {
+            toast.success(res?.message);
+            setAccessToken(res?.data?.accessToken);
+            setRefreshToken(res?.data?.refreshToken);
+            navigate("/");
+        },
+        (error) => {
+            handleToastMessageErrors(error);
+        }
+    );
+    useLoadingToast(isPending || isGooglePending, "Đang đăng nhập...", "login-loading");
 
     const handleFinish = (values: ILoginPayload) => {
         loginMutate(values);
@@ -124,7 +136,7 @@ function LoginPage() {
                                 <Checkbox className="!text-white">Nhớ mật khẩu</Checkbox>
                             </Form.Item>
                             <Link
-                                to="/forgot-password"
+                                to="/"
                                 className="!text-white text-sm underline hover:!text-gray-200"
                             >
                                 Quên mật khẩu?
@@ -134,7 +146,7 @@ function LoginPage() {
                         <Form.Item>
                             <button
                                 type="submit"
-                                disabled={isPending}
+                                disabled={isPending || isGooglePending}
                                 className="w-full bg-black text-white font-bold py-3 rounded-full hover:bg-gray-800 transition-all duration-300 text-[15px] shadow-md hover:shadow-lg"
                             >
                                 Đăng nhập
@@ -147,7 +159,30 @@ function LoginPage() {
                             <div className="flex-1 border-t border-white opacity-20"></div>
                         </div>
 
-                        <Form.Item>
+                        <div className="flex justify-center w-full">
+                            <GoogleLogin
+                                onSuccess={(credentialResponse) => {
+                                    if (credentialResponse.credential) {
+                                        googleLoginMutate(credentialResponse.credential);
+                                    }
+                                }}
+                                onError={() => {
+                                    toast.error("Đăng nhập Google thất bại");
+                                }}
+                                theme="outline"
+                                shape="pill"
+                                text="continue_with"
+                                width="384px"
+                            />
+                        </div>
+
+                        {/* <div className="flex items-center my-6">
+                            <div className="flex-1 border-t border-white opacity-20"></div>
+                            <span className="px-4 text-white text-sm opacity-60">Hoặc</span>
+                            <div className="flex-1 border-t border-white opacity-20"></div>
+                        </div> */}
+
+                        {/* <Form.Item>
                             <button
                                 type="button"
                                 className="w-full bg-white text-gray-700 font-semibold py-3 rounded-full flex items-center justify-center gap-3 hover:bg-gray-100 transition-all duration-300 text-[15px] shadow-sm"
@@ -172,10 +207,10 @@ function LoginPage() {
                                 </svg>
                                 Tiếp tục với Google
                             </button>
-                        </Form.Item>
+                        </Form.Item> */}
                         <div className="text-center">
                             <span className="text-white opacity-80">Chưa có tài khoản? </span>
-                            <Link to="/register" className="text-white font-bold underline hover:opacity-80">
+                            <Link to="/register" className="!text-white font-bold underline hover:opacity-80">
                                 Đăng ký ngay
                             </Link>
                         </div>

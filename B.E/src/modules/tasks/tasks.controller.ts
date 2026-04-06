@@ -84,4 +84,15 @@ export default {
             next(error)
         }
     },
+
+    async getTasks(req: Request<any>, res: Response, next: NextFunction) {
+        try {
+            const userId = req.user!.userId
+            const query = req.query
+            const result = await service.getTasks(userId, query)
+            return sendResponse(res, 200, "Lấy danh sách task thành công", result)
+        } catch (error) {
+            next(error)
+        }
+    },
 }

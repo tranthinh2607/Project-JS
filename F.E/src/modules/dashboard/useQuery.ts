@@ -4,11 +4,11 @@ import { api } from "./api";
 const moduleName = "dashboard";
 
 export const useDashboardQuery = {
-  useGetStatistics() {
+  useGetStatistics(params?: { startDate?: string; endDate?: string }) {
     return useQuery({
-      queryKey: [moduleName, "statistics"],
+      queryKey: [moduleName, "statistics", params],
       queryFn: async () => {
-        const res = await api.getStatistics();
+        const res = await api.getStatistics(params);
         if (res.status === 200) {
           return res.data;
         }
