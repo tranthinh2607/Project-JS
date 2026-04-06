@@ -110,4 +110,28 @@ export default {
         }
     },
 
+    async updateAvatar(req: Request, res: Response, next: NextFunction) {
+        try {
+            const userId = req.user?.userId
+            if (!userId) {
+                return sendResponse(res, 401, "Unauthorized", null, [{ field: "authorization", messages: ["Vui lòng đăng nhập"] }])
+            }
+
+            if (!req.file) {
+                return sendResponse(res, 400, "Vui lòng chọn ảnh", null, [{ field: "avatar", messages: ["Vui lòng chọn file ảnh"] }])
+            }
+
+            const avatarPath = `/uploads/avatars/${req.file.filename}`
+            const result = await service.updateAvatar(userId, avatarPath)
+
+            if (result instanceof ApiError) {
+                return sendResponse(res, result.status, result.message, null, result.errors)
+            }
+
+            return sendResponse(res, 200, "Cập nhật ảnh đại diện thành công", result)
+        } catch (error) {
+            next(error)
+        }
+    },
+
 }

@@ -76,7 +76,7 @@ function LoginPage() {
                 <div className="flex justify-center items-center flex-col gap-8 pt-20 pl-38 pb-20">
                     {/* Logo Replacement: System Name */}
                     <div className="flex flex-col items-center -mb-5">
-                        <h2 className="text-6xl font-black text-white tracking-widest drop-shadow-lg">
+                        <h2 className="text-4xl font-black text-white tracking-widest drop-shadow-lg">
                             TASK FLOW
                         </h2>
                         <div className="h-1.5 w-24 bg-white mt-2 rounded-full opacity-80"></div>

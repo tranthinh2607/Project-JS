@@ -72,4 +72,15 @@ export const useAuthQuery = {
       onError,
     });
   },
+  useUpdateAvatar(onSuccess?: (data: ApiResponse) => void, onError?: (error: ApiResponse) => void) {
+    return useMutation({
+      mutationFn: async (file: File) => {
+        const res = await api.updateAvatar(file);
+        if (res.status === 200) return res;
+        throw res;
+      },
+      onSuccess,
+      onError,
+    });
+  },
 };

@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import { clearTokens } from "../utils/cookies";
 import { useState, useEffect } from "react";
 import { useAuthQuery } from "../../modules/auth/useQuery";
+import { formatAvatar } from "../utils/formatAvatar";
 
 interface IProps {
   setTheme: (theme: string) => void;
@@ -114,7 +115,11 @@ function HeaderCustom({ setTheme, theme, isOpen }: IProps) {
           trigger={["click"]}
           placement="bottomRight">
           <div className="flex gap-2 items-center cursor-pointer pr-3 bg-[#F5F5F5] p-2 rounded-full">
-            <Avatar src="/assets/images/logo/favicon.png" className="h-8 w-8 " alt="avatar" />
+            <Avatar
+              src={formatAvatar(data?.avatar)}
+              className="h-8 w-8 "
+              alt="avatar"
+            />
             <div className="flex flex-col h-8 justify-between text-left">
               <p className="text-gray-700 font-semibold">{data?.name}</p>
               <div className="flex items-center gap-1 justify-between">

@@ -162,4 +162,40 @@ export const useTasksQuery = {
       enabled: !!taskId,
     });
   },
+  // Comments
+  useGetComments(taskId: string) {
+    return useQuery({
+      queryKey: [moduleName, taskId, "comments"],
+      queryFn: async () => await api.getComments(taskId),
+      enabled: !!taskId,
+    });
+  },
+  useAddComment(onSuccess?: (data: ApiResponse) => void, onError?: (error: ApiResponse) => void) {
+    return useMutation({
+      mutationFn: async ({ taskId, content }: { taskId: string; content: string }) => {
+        const res = await api.addComment(taskId, content);
+        if (res.status === 201 || res.status === 200) {
+          queryClient.invalidateQueries({ queryKey: [moduleName, taskId, "comments"] });
+          return res;
+        }
+        throw res;
+      },
+      onSuccess,
+      onError,
+    });
+  },
+  useDeleteComment(taskId: string, onSuccess?: (data: ApiResponse) => void, onError?: (error: ApiResponse) => void) {
+    return useMutation({
+      mutationFn: async (commentId: string) => {
+        const res = await api.deleteComment(commentId);
+        if (res.status === 200) {
+          queryClient.invalidateQueries({ queryKey: [moduleName, taskId, "comments"] });
+          return res;
+        }
+        throw res;
+      },
+      onSuccess,
+      onError,
+    });
+  },
 };

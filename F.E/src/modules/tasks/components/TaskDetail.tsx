@@ -10,6 +10,8 @@ import { handleToastMessageErrors } from "../../../core/utils/toastMessageError"
 import FormCreate from "./FormCreate";
 import { useMembersQuery } from "../../members/useQuery";
 import AssigneeCell from "./AssigneeCell";
+import TaskComments from "./TaskComments";
+import { formatAvatar } from "../../../core/utils/formatAvatar";
 
 const moduleKeyName = "tasks";
 
@@ -217,7 +219,7 @@ function TaskDetail({ open, task, projectId, onClose }: IProps) {
                             <Avatar.Group max={{ count: 2 }} size="small">
                               {sub.assignees?.map((a) => (
                                 <Tooltip key={a._id} title={a.name}>
-                                  <Avatar src={a.avatar} size="small" icon={!a.avatar && <UserIcon className="w-3 h-3" />} className="bg-blue-100 text-blue-600" />
+                                  <Avatar src={formatAvatar(a.avatar)} size="small" icon={!a.avatar && <UserIcon className="w-3 h-3" />} className="bg-blue-100 text-blue-600" />
                                 </Tooltip>
                               ))}
                             </Avatar.Group>
@@ -326,6 +328,11 @@ function TaskDetail({ open, task, projectId, onClose }: IProps) {
                 </div>
               ),
             },
+            {
+              key: "comments",
+              label: "Bình luận",
+              children: <TaskComments taskId={taskId} />,
+            },
           ]}
         />
       </Drawer>
@@ -364,7 +371,7 @@ function TaskDetail({ open, task, projectId, onClose }: IProps) {
         }}
         okText="Cập nhật"
         cancelText="Huỷ"
-        destroyOnClose
+        destroyOnHidden
       >
         <div className="py-2">
           <p className="text-sm text-gray-500 mb-2">Vui lòng nhập lý do tại sao nhiệm vụ này bị chặn:</p>

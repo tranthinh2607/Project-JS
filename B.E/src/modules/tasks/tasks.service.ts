@@ -122,20 +122,12 @@ export default {
         } else if (query.type === "mine") {
             createdBy = new mongoose.Types.ObjectId(userId)
         } else {
-            // Default: All tasks in projects the user is involved in + assigned + created
-            const user = await User.findById(userId)
-            const projectsAsMember = await memberRepo.findByEmail(user?.email || "")
+            // Default: Only tasks from projects owned by me OR specifically assigned to me
             const projectsAsOwner = await projectRepo.findByOwner(userId)
-            
-            projectIds = [
-                ...projectsAsMember.map((p: any) => new mongoose.Types.ObjectId(p.project_id)),
-                ...projectsAsOwner.map((p: any) => new mongoose.Types.ObjectId(p._id))
-            ]
+            projectIds = projectsAsOwner.map((p: any) => new mongoose.Types.ObjectId(p._id))
 
             const assignments = await assigneeRepo.findByUser(userId)
             assignedTaskIds = assignments.map((a: any) => a.task_id)
-            
-            createdBy = new mongoose.Types.ObjectId(userId)
         }
 
         const result = await repo.findTasks({

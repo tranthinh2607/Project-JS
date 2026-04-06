@@ -158,6 +158,41 @@ export const api = {
       throw error;
     }
   },
+  // Comments
+  getComments: async (taskId: string) => {
+    try {
+      const res = await axiosTaskFlowClient<ApiResponse<any[]>>({
+        method: "GET",
+        url: `${moduleName}/${taskId}/comments`,
+      });
+      return res.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+  addComment: async (taskId: string, content: string) => {
+    try {
+      const res = await axiosTaskFlowClient<ApiResponse<any>>({
+        method: "POST",
+        url: `${moduleName}/${taskId}/comments`,
+        data: { content },
+      });
+      return res.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+  deleteComment: async (commentId: string) => {
+    try {
+      const res = await axiosTaskFlowClient<ApiResponse<any>>({
+        method: "DELETE",
+        url: `${moduleName}/comments/${commentId}`,
+      });
+      return res.data;
+    } catch (error) {
+      throw error;
+    }
+  },
 };
 
 export default api;

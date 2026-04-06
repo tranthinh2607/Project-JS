@@ -9,6 +9,7 @@ import FormUpdate from "../components/FormUpdate";
 import { formatDate } from "../../../core/utils/formatDate";
 import { MemberPage } from "../../members";
 import { TaskPage } from "../../tasks";
+import DocumentTab from "../../documents/components/DocumentTab";
 
 interface IProps {
     projectId?: string | null;
@@ -109,6 +110,11 @@ function DetailPage({ projectId }: IProps) {
                             key: "members",
                             label: "Thành viên",
                             children: <MemberPage projectId={project._id} />
+                        },
+                        {
+                            key: "documents",
+                            label: "Tài liệu",
+                            children: <DocumentTab projectId={project._id} />
                         }
                     ]}
                     onChange={(key) => {

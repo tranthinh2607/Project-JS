@@ -199,7 +199,7 @@ function ListItems({
       fixed: "right",
       render: (_, record) => (
         <div className="flex items-center justify-center gap-1">
-          {/* <Button
+          <Button
             module_name={moduleKeyName}
             action="create"
             variant="transaction"
@@ -209,7 +209,7 @@ function ListItems({
             <Tooltip title="Thêm nhiệm vụ con">
               <PlusIcon className="w-4 h-4 mx-auto" />
             </Tooltip>
-          </Button> */}
+          </Button>
           <Popconfirm
             title="Xoá nhiệm vụ"
             description="Bạn có chắc muốn xoá nhiệm vụ này?"

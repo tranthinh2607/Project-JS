@@ -288,4 +288,14 @@ export default {
             ])
         }
     },
+
+    async updateAvatar(userId: string, avatarPath: string) {
+        const user = await repo.findById(userId)
+        if (!user) {
+            return new ApiError(404, "Không tìm thấy người dùng")
+        }
+
+        const result = await repo.update(userId, { avatar: avatarPath })
+        return result
+    },
 }

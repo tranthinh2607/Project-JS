@@ -82,5 +82,23 @@ export const api = {
     } catch (error) {
       throw error;
     }
+  },
+
+  updateAvatar: async (file: File): Promise<ApiResponse> => {
+    try {
+      const formData = new FormData();
+      formData.append('avatar', file);
+      const res = await axiosTaskFlowClient<ApiResponse>({
+        method: 'PATCH',
+        url: `${moduleName}/avatar`,
+        data: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return res.data;
+    } catch (error) {
+      throw error;
+    }
   }
 };

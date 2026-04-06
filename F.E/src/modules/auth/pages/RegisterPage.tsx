@@ -62,7 +62,7 @@ function RegisterPage() {
                 <div className="flex justify-center items-center flex-col gap-8 pl-38 pb-10">
                     {/* Logo Replacement: System Name */}
                     <div className="flex flex-col items-center -mb-5">
-                        <h2 className="text-5xl font-black text-white tracking-widest drop-shadow-md">
+                        <h2 className="text-4xl font-black text-white tracking-widest drop-shadow-md">
                             TASK FLOW
                         </h2>
                         <div className="h-1 w-20 bg-white mt-1 rounded-full opacity-80"></div>
@@ -178,7 +178,7 @@ function RegisterPage() {
 
                         <div className="text-center">
                             <span className="text-white opacity-80">Đã có tài khoản? </span>
-                            <Link to="/login" className="text-white font-bold underline hover:opacity-80">
+                            <Link to="/login" className="!text-white font-bold underline hover:opacity-80">
                                 Đăng nhập
                             </Link>
                         </div>

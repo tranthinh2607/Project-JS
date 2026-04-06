@@ -1,14 +1,15 @@
 import {
-  BanknotesIcon,
-  BriefcaseIcon,
   LockClosedIcon,
   UserIcon,
+  CameraIcon,
 } from "@heroicons/react/24/outline";
-import { Avatar } from "antd";
+import { Avatar, Upload } from "antd";
 import { useState } from "react";
 import { ProfileInfo, Security } from "../Tabs";
 import { useAuthQuery } from "../useQuery";
 import { useLoadingToast } from "../../../core/utils/useLoadingToast";
+import toast from "react-hot-toast";
+import { formatAvatar } from "../../../core/utils/formatAvatar";
 
 function ProfilePage() {
   const [tabs, setTabs] = useState<"profile" | "security">(
@@ -16,6 +17,16 @@ function ProfilePage() {
   );
 
   const { data: dataProfile, isLoading } = useAuthQuery.useProfile();
+  const { mutate: uploadAvatarMutate, isPending: isUploading } = useAuthQuery.useUpdateAvatar(
+    (res) => {
+      toast.success(res.message);
+      window.location.reload();
+    },
+    (error) => {
+      toast.error(error?.message || "Lỗi khi tải ảnh");
+    }
+  );
+
   const ItemsTabs = [
     {
       key: "profile",
@@ -34,10 +45,37 @@ function ProfilePage() {
   return (
     <div className="flex flex-col gap-3 max-w-6xl mx-auto">
       {/* Header */}
-      <div className="bg-white  flex gap-4 items-center ">
-        <Avatar size={65} src="/assets/images/logo/favicon.png" className="bg-primary/10" alt="avatar" />
-        <div className="flex flex-col gap-2">
-          <h2 className="text-2xl font-bold text-gray-800">{dataProfile?.name || "---"}</h2>
+      <div className="bg-white flex gap-4 items-center p-4 rounded-md">
+        <div className="relative group w-[70px] h-[70px]">
+          <Avatar
+            size={70}
+            src={formatAvatar(dataProfile?.avatar)}
+            className="bg-primary/10 border-2 border-white shadow-md text-2xl"
+            alt="avatar"
+          >
+            {dataProfile?.name?.charAt(0).toUpperCase()}
+          </Avatar>
+          <Upload
+            showUploadList={false}
+            accept="image/*"
+            beforeUpload={(file) => {
+              uploadAvatarMutate(file);
+              return false;
+            }}
+          >
+            <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer">
+              <CameraIcon className="w-6 h-6 text-white" />
+            </div>
+          </Upload>
+          {isUploading && (
+            <div className="absolute inset-0 bg-white/60 rounded-full flex items-center justify-center">
+              <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
+        </div>
+        <div className="flex flex-col">
+          <h2 className="text-2xl font-black text-gray-800 tracking-tight">{dataProfile?.name || "---"}</h2>
+          <p className="text-sm text-gray-500 font-medium lowercase">@{dataProfile?.username}</p>
         </div>
       </div>
 

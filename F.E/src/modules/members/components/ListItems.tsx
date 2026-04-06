@@ -4,6 +4,7 @@ import { formatDate } from "../../../core/utils/formatDate";
 import { TrashIcon, UserIcon } from "@heroicons/react/24/outline";
 import type { ColumnType } from "antd/es/table";
 import { Button } from "../../../core/layouts";
+import { formatAvatar } from "../../../core/utils/formatAvatar";
 
 interface IProps {
   data: IMember[];
@@ -33,7 +34,7 @@ function ListItems({
       render: (_, record) => (
         <div className="flex items-center gap-3">
           <Avatar
-            src={record.user?.avatar}
+            src={formatAvatar(record.user?.avatar)}
             icon={!record.user?.avatar && <UserIcon className="w-4 h-4" />}
             className="bg-blue-100 text-blue-600"
           />

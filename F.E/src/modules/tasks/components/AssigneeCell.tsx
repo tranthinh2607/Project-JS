@@ -10,6 +10,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { Button } from "../../../core/layouts";
 import { useMembersQuery } from "../../members/useQuery";
+import { formatAvatar } from "../../../core/utils/formatAvatar";
 
 const colors = ["#f56a00", "#7265e6", "#ffbf00", "#00a2ae"];
 
@@ -117,7 +118,7 @@ export default function AssigneeCell({
               <div className="flex items-center gap-2">
                 <Avatar
                   size="small"
-                  src={item.user?.avatar}
+                  src={formatAvatar(item.user?.avatar)}
                   style={{
                     backgroundColor: isRegister ? getColor(userId || item._id) : "#ccc",
                   }}
@@ -178,7 +179,7 @@ export default function AssigneeCell({
             {assignees.map((user: any) => (
               <Tooltip key={user._id} title={user.name}>
                 <Avatar
-                  src={user.avatar}
+                  src={formatAvatar(user.avatar)}
                   style={{ backgroundColor: getColor(user._id) }}
                   icon={!user.avatar && <UserIcon className="w-3 h-3" />}
                 >
