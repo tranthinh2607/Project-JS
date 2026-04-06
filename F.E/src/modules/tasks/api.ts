@@ -63,12 +63,13 @@ export const api = {
     }
   },
   // Assignees
-  assign: async (taskId: string, userId: string) => {
+  assign: async (taskId: string, userIds: string | string[]) => {
     try {
+      const payload = Array.isArray(userIds) ? { user_ids: userIds } : { user_id: userIds };
       const res = await axiosTaskFlowClient<ApiResponse>({
         method: "POST",
         url: `${moduleName}/${taskId}/assign`,
-        data: { user_id: userId },
+        data: payload,
       });
       return res.data;
     } catch (error) {

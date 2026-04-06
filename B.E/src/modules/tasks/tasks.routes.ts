@@ -6,7 +6,6 @@ import checklistController from "./checklists/checklist.controller"
 import validateDTO from "@core/middlewares/dtoValidator"
 import { CreateTaskDto, UpdateTaskDto } from "./dto/tasks.dto"
 import { ChangeTaskStatusDto } from "./status/dto/task-status.dto"
-import { AssignTaskDto } from "./assignees/dto/task-assignee.dto"
 import { CreateChecklistItemDto, ToggleChecklistItemDto } from "./checklists/dto/checklist.dto"
 import authMiddleware from "@core/middlewares/auth.middleware"
 
@@ -23,7 +22,7 @@ router.delete("/:id", controller.deleteTask)
 router.post("/:id/status", validateDTO(ChangeTaskStatusDto), statusController.changeStatus)
 router.get("/:id/status-history", statusController.getHistory)
 
-router.post("/:id/assign", validateDTO(AssignTaskDto), assigneeController.assignUser)
+router.post("/:id/assign", assigneeController.assignUser)
 router.delete("/:id/assign/:userId", assigneeController.unassignUser)
 
 // Checklist routes

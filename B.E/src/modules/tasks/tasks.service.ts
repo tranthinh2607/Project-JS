@@ -62,7 +62,7 @@ export default {
     },
 
     async getTaskDetail(taskId: string) {
-        const task = await repo.findById(taskId)
+        const task = await repo.findWithDetail(taskId)
         if (!task) {
             return new ApiError(404, "Không tìm thấy task")
         }

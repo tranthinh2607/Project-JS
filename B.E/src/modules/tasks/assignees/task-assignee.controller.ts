@@ -1,15 +1,14 @@
 import { Response, NextFunction } from "express"
 import service from "./task-assignee.service"
 import { sendResponse } from "@core/utils/response"
-import { AssignTaskDto } from "./dto/task-assignee.dto"
 import { Request } from "@core/types/request"
 import ApiError from "@core/utils/apiError"
 
 export default {
-    async assignUser(req: Request<AssignTaskDto>, res: Response, next: NextFunction) {
+    async assignUser(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req.params
-            const dto = req.dto!
+            const dto = req.body
             const userId = req.user!.userId
             const result = await service.assignUser(id as string, dto, userId)
 

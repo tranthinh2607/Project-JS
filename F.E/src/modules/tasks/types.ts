@@ -39,6 +39,7 @@ interface ITask {
   assignees: IAssignee[];
   subtask_count?: number;
   subtasks?: ITask[];
+  children?: ITask[];
   createdAt: string;
   updatedAt?: string;
 }
