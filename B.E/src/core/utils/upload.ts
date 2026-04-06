@@ -48,8 +48,40 @@ const documentStorage = multer.diskStorage({
     },
 })
 
+const documentFileFilter = (req: any, file: any, cb: any) => {
+    const allowedTypes = [
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/vnd.ms-powerpoint",
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        "text/plain",
+        "text/csv",
+        "application/rtf",
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+    ]
+    
+    const allowedExtensions = [
+        ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt", ".csv", ".rtf",
+        ".jpg", ".jpeg", ".png", ".webp"
+    ]
+
+    const extension = path.extname(file.originalname).toLowerCase()
+    
+    if (allowedTypes.includes(file.mimetype) && allowedExtensions.includes(extension)) {
+        cb(null, true)
+    } else {
+        cb(new ApiError(400, "Định dạng file không hỗ trợ. Vui lòng tải các file tài liệu (pdf, doc, docx, xls, xlsx, txt, csv) hoặc ảnh."), false)
+    }
+}
+
 export const uploadDocument = multer({
     storage: documentStorage,
+    fileFilter: documentFileFilter,
     limits: {
         fileSize: 10 * 1024 * 1024, // 10MB
     },
