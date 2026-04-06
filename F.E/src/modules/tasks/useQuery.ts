@@ -45,7 +45,7 @@ export const useTasksQuery = {
     return useMutation({
       mutationFn: async ({ id, payload }: { id: string; payload: { status: string; note?: string } }) => {
         const res = await api.changeStatus(id, payload);
-        if (res.status === 200) {
+        if (res.status === 200 || res.status === 201) {
           queryClient.invalidateQueries({ queryKey: [moduleName] });
           return res;
         }
@@ -72,8 +72,8 @@ export const useTasksQuery = {
   // Assignees
   useAssign(onSuccess?: (data: ApiResponse) => void, onError?: (error: ApiResponse) => void) {
     return useMutation({
-      mutationFn: async ({ taskId, userId }: { taskId: string; userId: string }) => {
-        const res = await api.assign(taskId, userId);
+      mutationFn: async ({ taskId, userIds }: { taskId: string; userIds: string | string[] }) => {
+        const res = await api.assign(taskId, userIds);
         if (res.status === 200 || res.status === 201) {
           queryClient.invalidateQueries({ queryKey: [moduleName] });
           return res;

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Drawer, Tabs, Tag, Select, Avatar, Tooltip, Input, Checkbox, Popconfirm, Timeline, Divider, Empty } from "antd";
+import { Drawer, Tabs, Tag, Select, Avatar, Tooltip, Input, Checkbox, Popconfirm, Timeline, Divider, Empty, Modal } from "antd";
 import type { ITask, IChecklistItem, IStatusHistory } from "../types";
 import { useTasksQuery } from "../useQuery";
 import { formatDate } from "../../../core/utils/formatDate";
@@ -9,6 +9,9 @@ import toast from "react-hot-toast";
 import { handleToastMessageErrors } from "../../../core/utils/toastMessageError";
 import FormCreate from "./FormCreate";
 import { useMembersQuery } from "../../members/useQuery";
+import AssigneeCell from "./AssigneeCell";
+
+const moduleKeyName = "tasks";
 
 const priorityMap: Record<string, { color: string; label: string }> = {
   low: { color: "green", label: "Thấp" },
@@ -34,6 +37,9 @@ function TaskDetail({ open, task, projectId, onClose }: IProps) {
   const [activeTab, setActiveTab] = useState("info");
   const [newChecklistTitle, setNewChecklistTitle] = useState("");
   const [openCreateSubtask, setOpenCreateSubtask] = useState(false);
+  const [isBlockedModalOpen, setIsBlockedModalOpen] = useState(false);
+  const [blockedNote, setBlockedNote] = useState("");
+  const [pandingStatus, setPandingStatus] = useState<string | null>(null);
 
   const taskId = task?._id || "";
 
@@ -46,7 +52,6 @@ function TaskDetail({ open, task, projectId, onClose }: IProps) {
   const detail = taskDetail || task;
   const checklists: IChecklistItem[] = (checklistRes as any)?.data || [];
   const statusHistory: IStatusHistory[] = (historyRes as any)?.data || [];
-  const projectMembers = (membersRes as any)?.data || [];
 
   // Mutations
   const { mutate: changeStatus } = useTasksQuery.useChangeStatus(
@@ -77,7 +82,6 @@ function TaskDetail({ open, task, projectId, onClose }: IProps) {
   if (!detail) return null;
 
   const subtasks = (detail as any)?.subtasks || [];
-  const assignedIds = detail.assignees?.map((a) => a._id) || [];
 
   return (
     <>
@@ -100,9 +104,15 @@ function TaskDetail({ open, task, projectId, onClose }: IProps) {
             <span className="text-gray-500 text-sm">Trạng thái:</span>
             <Select
               value={detail.status}
-              size="small"
               className="w-40"
-              onChange={(value) => changeStatus({ id: taskId, payload: { status: value } })}
+              onChange={(value) => {
+                if (value === "blocked") {
+                  setPandingStatus(value);
+                  setIsBlockedModalOpen(true);
+                } else {
+                  changeStatus({ id: taskId, payload: { status: value } });
+                }
+              }}
               options={[
                 { value: "todo", label: "Chờ xử lý" },
                 { value: "in_progress", label: "Đang thực hiện" },
@@ -158,47 +168,16 @@ function TaskDetail({ open, task, projectId, onClose }: IProps) {
                       <span className="font-semibold text-gray-700">Người thực hiện</span>
                     </div>
 
-                    {/* Current Assignees */}
                     <div className="flex flex-wrap gap-2 mb-3">
-                      {detail.assignees?.map((a) => (
-                        <Tag
-                          key={a._id}
-                          closable
-                          onClose={() => unassignUser({ taskId, userId: a._id })}
-                          className="flex items-center gap-1 py-1 px-2 rounded-full"
-                        >
-                          <Avatar
-                            src={a.avatar}
-                            icon={!a.avatar && <UserIcon className="w-3 h-3" />}
-                            size="small"
-                            className="bg-blue-100 text-blue-600"
-                          />
-                          <span>{a.name}</span>
-                        </Tag>
-                      ))}
-                      {(!detail.assignees || detail.assignees.length === 0) && (
-                        <span className="text-gray-400 text-sm">Chưa có người thực hiện</span>
-                      )}
+                      <AssigneeCell
+                        data={detail.assignees || []}
+                        projectId={projectId}
+                        taskId={taskId}
+                        moduleKeyName={moduleKeyName}
+                        handleAddAssignee={(userId) => assignUser({ taskId, userIds: [userId] })}
+                        handleRemoveAssignee={(userId) => unassignUser({ taskId, userId })}
+                      />
                     </div>
-
-                    {/* Add Assignee */}
-                    <Select
-                      placeholder="Chọn thành viên để giao việc..."
-                      className="w-full"
-                      size="small"
-                      showSearch
-                      optionFilterProp="label"
-                      onChange={(value) => {
-                        assignUser({ taskId, userId: value });
-                      }}
-                      value={null}
-                      options={projectMembers
-                        .filter((m: any) => !assignedIds.includes(m.user?._id))
-                        .map((m: any) => ({
-                          value: m.user?._id,
-                          label: m.user?.name || m.email,
-                        }))}
-                    />
                   </div>
                 </div>
               ),
@@ -360,6 +339,44 @@ function TaskDetail({ open, task, projectId, onClose }: IProps) {
           refetchDetail();
         }}
       />
+
+      <Modal
+        title="Lý do bị chặn"
+        open={isBlockedModalOpen}
+        onCancel={() => {
+          setIsBlockedModalOpen(false);
+          setBlockedNote("");
+          setPandingStatus(null);
+        }}
+        onOk={() => {
+          if (!blockedNote.trim()) {
+            return toast.error("Vui lòng nhập lý do");
+          }
+          if (pandingStatus) {
+            changeStatus({
+              id: taskId,
+              payload: { status: pandingStatus, note: blockedNote.trim() }
+            });
+            setIsBlockedModalOpen(false);
+            setBlockedNote("");
+            setPandingStatus(null);
+          }
+        }}
+        okText="Cập nhật"
+        cancelText="Huỷ"
+        destroyOnClose
+      >
+        <div className="py-2">
+          <p className="text-sm text-gray-500 mb-2">Vui lòng nhập lý do tại sao nhiệm vụ này bị chặn:</p>
+          <Input.TextArea
+            rows={4}
+            value={blockedNote}
+            onChange={(e) => setBlockedNote(e.target.value)}
+            placeholder="Nhập lý do tại đây..."
+            autoFocus
+          />
+        </div>
+      </Modal>
     </>
   );
 }

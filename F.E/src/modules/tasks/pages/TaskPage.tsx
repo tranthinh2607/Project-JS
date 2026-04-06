@@ -24,6 +24,7 @@ function TaskPage({ projectId }: { projectId: string }) {
   const [openCreate, setOpenCreate] = useState(false);
   const [selectedTask, setSelectedTask] = useState<ITask | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
+  const [parentTaskId, setParentTaskId] = useState<string | null>(null);
 
   const {
     data,
@@ -52,6 +53,11 @@ function TaskPage({ projectId }: { projectId: string }) {
   const handleView = (record: ITask) => {
     setSelectedTask(record);
     setDetailOpen(true);
+  };
+
+  const handleCreateSubTask = (record: ITask) => {
+    setParentTaskId(record._id);
+    setOpenCreate(true);
   };
 
   return (
@@ -83,12 +89,22 @@ function TaskPage({ projectId }: { projectId: string }) {
         onChangePage={handlePageChange}
         handleDelete={handleDelete}
         handleView={handleView}
+        onCreateSubTask={handleCreateSubTask}
         isLoading={isLoading}
         moduleKeyName={moduleKeyName}
         keyword={params?.keyword}
+        projectId={projectId}
       />
 
-      <FormCreate projectId={projectId} open={openCreate} onClose={() => setOpenCreate(false)} />
+      <FormCreate
+        projectId={projectId}
+        parentTaskId={parentTaskId}
+        open={openCreate}
+        onClose={() => {
+          setOpenCreate(false);
+          setParentTaskId(null);
+        }}
+      />
 
       <TaskDetail
         open={detailOpen}

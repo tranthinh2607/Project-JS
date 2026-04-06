@@ -23,7 +23,12 @@ export default {
                     as: "user"
                 }
             },
-            { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } }
+            { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+            {
+                $addFields: {
+                    isRegister: { $cond: { if: "$user", then: true, else: false } }
+                }
+            }
         ])
     },
 

@@ -27,7 +27,7 @@ export default {
 
         // Rule quan trọng: blocked -> bắt buộc có note
         if (dto.status === TaskStatusEnum.BLOCKED && !dto.note) {
-            return new ApiError(400, "Blocked status requires a note (reason).")
+            return new ApiError(400, "Khi chuyển sang trạng thái bị chặn, bạn phải nhập lý do")
         }
 
         const statusDoc = await repo.create({

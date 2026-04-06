@@ -1,14 +1,15 @@
 import { Pagination, Popconfirm, Table, Tag, Tooltip, Avatar, Select } from "antd";
 import { useState, useEffect } from "react";
+import AssigneeCell from "./AssigneeCell";
 import type { ITask } from "../types";
 import { formatDate } from "../../../core/utils/formatDate";
-import { TrashIcon, UserIcon, EyeIcon } from "@heroicons/react/24/outline";
+import { TrashIcon, UserIcon, EyeIcon, PlusIcon } from "@heroicons/react/24/outline";
 import type { ColumnType } from "antd/es/table";
 import { Button } from "../../../core/layouts";
 import toast from "react-hot-toast";
 import { useTasksQuery } from "../useQuery";
 import { handleToastMessageErrors } from "../../../core/utils/toastMessageError";
-import { api } from "../api";
+import api from "../api";
 
 const priorityMap: Record<string, { color: string; label: string }> = {
   low: { color: "green", label: "Thấp" },
@@ -27,8 +28,10 @@ interface IProps {
   isLoading?: boolean;
   handleDelete: (id: string) => void;
   handleView?: (record: ITask) => void;
+  onCreateSubTask?: (record: ITask) => void;
   moduleKeyName: string;
   keyword?: string;
+  projectId: string;
 }
 
 function ListItems({
@@ -38,13 +41,25 @@ function ListItems({
   isLoading,
   handleDelete,
   handleView,
+  onCreateSubTask,
   moduleKeyName,
   keyword,
+  projectId,
 }: IProps) {
   const [treeData, setTreeData] = useState<ITask[]>([]);
 
   const { mutate: changeStatus } = useTasksQuery.useChangeStatus(
     () => toast.success("Cập nhật trạng thái thành công"),
+    (error) => handleToastMessageErrors(error)
+  );
+  
+  const { mutate: assignUser } = useTasksQuery.useAssign(
+    () => toast.success("Giao việc thành công"),
+    (error) => handleToastMessageErrors(error)
+  );
+
+  const { mutate: unassignUser } = useTasksQuery.useUnassign(
+    () => toast.success("Hủy giao việc thành công"),
     (error) => handleToastMessageErrors(error)
   );
 
@@ -108,20 +123,14 @@ function ListItems({
       key: "assignees",
       width: 160,
       render: (_, record) => (
-        <Avatar.Group max={{ count: 3 }} size="small">
-          {record.assignees?.map((a) => (
-            <Tooltip key={a._id} title={a.name}>
-              <Avatar
-                src={a.avatar}
-                icon={!a.avatar && <UserIcon className="w-3 h-3" />}
-                className="bg-blue-100 text-blue-600"
-              />
-            </Tooltip>
-          ))}
-          {(!record.assignees || record.assignees.length === 0) && (
-            <span className="text-gray-400 text-xs">Chưa giao</span>
-          )}
-        </Avatar.Group>
+        <AssigneeCell
+          data={record.assignees || []}
+          projectId={projectId}
+          taskId={record._id}
+          moduleKeyName={moduleKeyName}
+          handleAddAssignee={(userId) => assignUser({ taskId: record._id, userIds: [userId] })}
+          handleRemoveAssignee={(userId) => unassignUser({ taskId: record._id, userId })}
+        />
       ),
     },
     {
@@ -139,12 +148,11 @@ function ListItems({
       title: "Trạng thái",
       dataIndex: "status",
       key: "status",
-      width: 160,
+      width: 180,
       align: "center",
       render: (status: string, record) => (
         <Select
           value={status}
-          size="small"
           className="w-full"
           onChange={(value) => {
             changeStatus({ id: record._id, payload: { status: value } });
@@ -162,7 +170,7 @@ function ListItems({
       title: "Ngày tạo",
       dataIndex: "createdAt",
       key: "createdAt",
-      width: 130,
+      width: 180,
       align: "center",
       render: (text: string) => formatDate(text),
     },
@@ -176,13 +184,13 @@ function ListItems({
         <div className="flex items-center justify-center gap-1">
           <Button
             module_name={moduleKeyName}
-            action="read"
+            action="create"
             variant="transaction"
-            className="!p-1 h-8 w-8 text-blue-600 hover:text-blue-700 border-none"
-            onClick={() => handleView?.(record)}
+            className="!p-1 h-8 w-8 text-blue-600 hover:text-blue-700"
+            onClick={() => onCreateSubTask?.(record)}
           >
-            <Tooltip title="Chi tiết">
-              <EyeIcon className="w-4 h-4 mx-auto" />
+            <Tooltip title="Thêm nhiệm vụ con">
+              <PlusIcon className="w-4 h-4 mx-auto" />
             </Tooltip>
           </Button>
           <Popconfirm
@@ -197,7 +205,7 @@ function ListItems({
               module_name={moduleKeyName}
               action="delete"
               variant="transaction"
-              className="!p-1 h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 border-none"
+              className="!p-1 h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
             >
               <Tooltip title="Xoá">
                 <TrashIcon className="w-4 h-4 mx-auto" />
