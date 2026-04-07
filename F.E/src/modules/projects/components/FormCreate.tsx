@@ -1,4 +1,5 @@
-import { Form, Input, Modal } from "antd";
+import { Form, Input, Modal, DatePicker, Select } from "antd";
+import dayjs from "dayjs";
 import { useProjectQuery } from "../useQuery";
 import type { IPayload, IProject } from "../types";
 import toast from "react-hot-toast";
@@ -27,8 +28,13 @@ function FormCreate({ open, onClose, onSuccess }: IProps) {
     }
   );
 
-  const handleFinish = (values: IPayload) => {
-    createItem(values);
+  const handleFinish = (values: any) => {
+    const payload = {
+      ...values,
+      expected_start_date: values.expected_start_date ? values.expected_start_date.toISOString() : undefined,
+      expected_end_date: values.expected_end_date ? values.expected_end_date.toISOString() : undefined,
+    };
+    createItem(payload);
   };
 
   const handleCancel = () => {
@@ -71,6 +77,35 @@ function FormCreate({ open, onClose, onSuccess }: IProps) {
           rules={[{ max: 500, message: "Mô tả không được quá 500 ký tự" }]}
         >
           <Input.TextArea placeholder="Nhập mô tả chi tiết dự án (không bắt buộc)..." rows={4} />
+        </Form.Item>
+
+        <div className="grid grid-cols-2 gap-4">
+          <Form.Item
+            name="expected_start_date"
+            label="Ngày bắt đầu dự kiến"
+          >
+            <DatePicker className="w-full" placeholder="Chọn ngày" format="DD/MM/YYYY" />
+          </Form.Item>
+
+          <Form.Item
+            name="expected_end_date"
+            label="Ngày kết thúc dự kiến"
+          >
+            <DatePicker className="w-full" placeholder="Chọn ngày" format="DD/MM/YYYY" />
+          </Form.Item>
+        </div>
+
+        <Form.Item
+          name="status"
+          label="Trạng thái dự án"
+          initialValue="active"
+        >
+          <Select placeholder="Chọn trạng thái">
+            <Select.Option value="active">Đang hoạt động</Select.Option>
+            <Select.Option value="on_hold">Tạm dừng</Select.Option>
+            <Select.Option value="completed">Đã hoàn thành</Select.Option>
+            <Select.Option value="cancelled">Đã hủy</Select.Option>
+          </Select>
         </Form.Item>
       </Form>
     </Modal>

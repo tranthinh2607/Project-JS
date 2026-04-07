@@ -6,6 +6,9 @@ export interface IProject extends Document {
     name: string
     description?: string
     owner_id: mongoose.Types.ObjectId
+    expected_start_date?: Date
+    expected_end_date?: Date
+    status: "active" | "completed" | "on_hold" | "cancelled"
     createdAt: Date
     updatedAt: Date
 }
@@ -32,6 +35,19 @@ const ProjectSchema = new Schema<IProject>(
             type: Schema.Types.ObjectId,
             ref: "User",
             required: true,
+        },
+        expected_start_date: {
+            type: Date,
+            default: null,
+        },
+        expected_end_date: {
+            type: Date,
+            default: null,
+        },
+        status: {
+            type: String,
+            enum: ["active", "completed", "on_hold", "cancelled"],
+            default: "active",
         },
     },
     {

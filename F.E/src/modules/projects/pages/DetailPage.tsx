@@ -1,15 +1,23 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useProjectQuery } from "../useQuery";
-import { ArrowLeftIcon, ClipboardDocumentIcon, PencilIcon } from "@heroicons/react/24/outline";
+import { 
+    ArrowLeftIcon, 
+    ClipboardDocumentIcon, 
+    PencilIcon,
+    ArrowDownTrayIcon 
+} from "@heroicons/react/24/outline";
 import { copyToClipboard } from "../../../core/utils/copyToClipboard";
-import { Divider, Tabs } from "antd";
+import { Divider, Tabs, Badge } from "antd";
 import { ItemRow, LoadingPage, NotFoundPage } from "../../../core/layouts";
 import FormUpdate from "../components/FormUpdate";
 import { formatDate } from "../../../core/utils/formatDate";
 import { MemberPage } from "../../members";
 import { TaskPage } from "../../tasks";
 import DocumentTab from "../../documents/components/DocumentTab";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { ProjectReportPDF } from "../components/ProjectReportPDF";
+import { useTasksQuery } from "../../tasks/useQuery";
 
 interface IProps {
     projectId?: string | null;
@@ -25,9 +33,21 @@ function DetailPage({ projectId }: IProps) {
     const [openUpdate, setOpenUpdate] = useState(false);
 
     const { data: project, isLoading, refetch } = useProjectQuery.useGetById(id as string);
+    
+    // Fetch all tasks for report
+    const { data: tasksData } = useTasksQuery.useGetByProject(id as string, { page: 1, limit: 1000 });
+    const tasks = tasksData?.data || [];
 
     if (isLoading) return <LoadingPage />
     if (!project) return <NotFoundPage />
+
+    const statusMap: Record<string, { label: string, color: string }> = {
+        active: { label: "Đang hoạt động", color: "blue" },
+        completed: { label: "Đã hoàn thành", color: "green" },
+        on_hold: { label: "Tạm dừng", color: "orange" },
+        cancelled: { label: "Đã hủy", color: "red" },
+    };
+    const projectStatus = statusMap[project.status] || { label: "---", color: "default" };
 
     return (
         <div className="flex flex-col gap-2 rounded-sm relative">
@@ -61,7 +81,21 @@ function DetailPage({ projectId }: IProps) {
                     </div>
 
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
+                    <PDFDownloadLink
+                        document={<ProjectReportPDF project={project as any} tasks={tasks} />}
+                        fileName={`Bao_cao_du_an_${project.code}.pdf`}
+                    >
+                        {({ loading }) => (
+                            <button
+                                disabled={loading}
+                                className="text-green-600 !underline flex items-center gap-1 cursor-pointer disabled:text-gray-400"
+                            >
+                                <ArrowDownTrayIcon className="w-4 h-4" />
+                                {loading ? "Đang chuẩn bị..." : "Xuất báo cáo PDF"}
+                            </button>
+                        )}
+                    </PDFDownloadLink>
                     <button
                         onClick={() => setOpenUpdate(true)}
                         className="text-blue-600 !underline flex items-center gap-1"
@@ -75,7 +109,7 @@ function DetailPage({ projectId }: IProps) {
             <div className="overflow-y-auto h-[calc(100vh-195px)] border-t border-gray-100 mt-2">
                 <Tabs
                     activeKey={activeTab}
-                    renderTabBar={(props, DefaultTabBar) => (
+                    renderTabBar={(props: any, DefaultTabBar: any) => (
                         <div className="sticky top-0 bg-white z-10">
                             <DefaultTabBar {...props} />
                         </div>
@@ -88,8 +122,19 @@ function DetailPage({ projectId }: IProps) {
                                 <div className="py-4 flex flex-col">
                                     <div className="grid grid-cols-5 gap-6">
                                         <ItemRow label="Chủ sở hữu" value={project.owner_name} />
+                                        <ItemRow 
+                                            label="Trạng thái" 
+                                            value={<Badge color={projectStatus.color} text={projectStatus.label} />} 
+                                        />
+                                        <ItemRow 
+                                            label="Ngày bắt đầu" 
+                                            value={project.expected_start_date ? formatDate(project.expected_start_date) : "---"} 
+                                        />
+                                        <ItemRow 
+                                            label="Ngày kết thúc" 
+                                            value={project.expected_end_date ? formatDate(project.expected_end_date) : "---"} 
+                                        />
                                         <ItemRow label="Ngày tạo" value={formatDate(project.createdAt)} />
-                                        <ItemRow label="Cập nhật lần cuối" value={formatDate(project.updatedAt)} />
                                     </div>
                                     <Divider />
                                     <div>
@@ -117,7 +162,7 @@ function DetailPage({ projectId }: IProps) {
                             children: <DocumentTab projectId={project._id} />
                         }
                     ]}
-                    onChange={(key) => {
+                    onChange={(key: string) => {
                         setActiveTab(key);
                         if (key === "generalInfo") {
                             refetch();
