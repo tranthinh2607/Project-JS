@@ -1,8 +1,150 @@
 {
-  "hash": "e962a565",
-  "configHash": "091f69cd",
-  "lockfileHash": "c12fa779",
-  "browserHash": "dded2680",
-  "optimized": {},
-  "chunks": {}
+  "hash": "56dbbc72",
+  "configHash": "7fa634a2",
+  "lockfileHash": "f66a89ce",
+  "browserHash": "39a0dff7",
+  "optimized": {
+    "@ant-design/icons": {
+      "src": "../../node_modules/@ant-design/icons/es/index.js",
+      "file": "@ant-design_icons.js",
+      "fileHash": "5772b2cd",
+      "needsInterop": false
+    },
+    "@heroicons/react/24/outline": {
+      "src": "../../node_modules/@heroicons/react/24/outline/esm/index.js",
+      "file": "@heroicons_react_24_outline.js",
+      "fileHash": "bb7a8e7b",
+      "needsInterop": false
+    },
+    "@react-oauth/google": {
+      "src": "../../node_modules/@react-oauth/google/dist/index.esm.js",
+      "file": "@react-oauth_google.js",
+      "fileHash": "60c070dd",
+      "needsInterop": false
+    },
+    "@react-pdf/renderer": {
+      "src": "../../node_modules/@react-pdf/renderer/lib/react-pdf.browser.js",
+      "file": "@react-pdf_renderer.js",
+      "fileHash": "eb3f5332",
+      "needsInterop": false
+    },
+    "@tanstack/react-query": {
+      "src": "../../node_modules/@tanstack/react-query/build/modern/index.js",
+      "file": "@tanstack_react-query.js",
+      "fileHash": "20b1b13e",
+      "needsInterop": false
+    },
+    "antd": {
+      "src": "../../node_modules/antd/es/index.js",
+      "file": "antd.js",
+      "fileHash": "43abd110",
+      "needsInterop": false
+    },
+    "antd/es/layout/Sider": {
+      "src": "../../node_modules/antd/es/layout/Sider.js",
+      "file": "antd_es_layout_Sider.js",
+      "fileHash": "2cdf3b5b",
+      "needsInterop": false
+    },
+    "axios": {
+      "src": "../../node_modules/axios/index.js",
+      "file": "axios.js",
+      "fileHash": "45326cbc",
+      "needsInterop": false
+    },
+    "dayjs": {
+      "src": "../../node_modules/dayjs/dayjs.min.js",
+      "file": "dayjs.js",
+      "fileHash": "2b220004",
+      "needsInterop": true
+    },
+    "dayjs/plugin/quarterOfYear": {
+      "src": "../../node_modules/dayjs/plugin/quarterOfYear.js",
+      "file": "dayjs_plugin_quarterOfYear.js",
+      "fileHash": "e7f66a51",
+      "needsInterop": true
+    },
+    "framer-motion": {
+      "src": "../../node_modules/framer-motion/dist/es/index.mjs",
+      "file": "framer-motion.js",
+      "fileHash": "1b82e48e",
+      "needsInterop": false
+    },
+    "js-cookie": {
+      "src": "../../node_modules/js-cookie/dist/js.cookie.mjs",
+      "file": "js-cookie.js",
+      "fileHash": "167cec74",
+      "needsInterop": false
+    },
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "cefc4f7a",
+      "needsInterop": true
+    },
+    "react-hot-toast": {
+      "src": "../../node_modules/react-hot-toast/dist/index.mjs",
+      "file": "react-hot-toast.js",
+      "fileHash": "573aef49",
+      "needsInterop": false
+    },
+    "react-router-dom": {
+      "src": "../../node_modules/react-router-dom/dist/index.mjs",
+      "file": "react-router-dom.js",
+      "fileHash": "d33542a2",
+      "needsInterop": false
+    },
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "30d2b7d7",
+      "needsInterop": true
+    },
+    "react/jsx-dev-runtime": {
+      "src": "../../node_modules/react/jsx-dev-runtime.js",
+      "file": "react_jsx-dev-runtime.js",
+      "fileHash": "85c72c74",
+      "needsInterop": true
+    },
+    "recharts": {
+      "src": "../../node_modules/recharts/es6/index.js",
+      "file": "recharts.js",
+      "fileHash": "1ad39136",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "Sider-BzABAbQq": {
+      "file": "Sider-BzABAbQq.js",
+      "isDynamicEntry": false
+    },
+    "ZoomOutOutlined-Bc2ajN2V": {
+      "file": "ZoomOutOutlined-Bc2ajN2V.js",
+      "isDynamicEntry": false
+    },
+    "chunk-BoAXSpZd": {
+      "file": "chunk-BoAXSpZd.js",
+      "isDynamicEntry": false
+    },
+    "client-D_ljg0cJ": {
+      "file": "client-D_ljg0cJ.js",
+      "isDynamicEntry": false
+    },
+    "clsx-CAT_cZ_M": {
+      "file": "clsx-CAT_cZ_M.js",
+      "isDynamicEntry": false
+    },
+    "jsx-runtime-B5pX4aVc": {
+      "file": "jsx-runtime-B5pX4aVc.js",
+      "isDynamicEntry": false
+    },
+    "react-dom-r6q3SGj9": {
+      "file": "react-dom-r6q3SGj9.js",
+      "isDynamicEntry": false
+    },
+    "ref-D2csXVAa": {
+      "file": "ref-D2csXVAa.js",
+      "isDynamicEntry": false
+    }
+  }
 }

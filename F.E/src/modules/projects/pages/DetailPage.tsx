@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useProjectQuery } from "../useQuery";
-import { 
-    ArrowLeftIcon, 
-    ClipboardDocumentIcon, 
+import {
+    ArrowLeftIcon,
+    ClipboardDocumentIcon,
     PencilIcon,
-    ArrowDownTrayIcon 
+    ArrowDownTrayIcon
 } from "@heroicons/react/24/outline";
 import { copyToClipboard } from "../../../core/utils/copyToClipboard";
 import { Divider, Tabs, Badge } from "antd";
@@ -33,7 +33,7 @@ function DetailPage({ projectId }: IProps) {
     const [openUpdate, setOpenUpdate] = useState(false);
 
     const { data: project, isLoading, refetch } = useProjectQuery.useGetById(id as string);
-    
+
     // Fetch all tasks for report
     const { data: tasksData } = useTasksQuery.useGetByProject(id as string, { page: 1, limit: 1000 });
     const tasks = tasksData?.data || [];
@@ -122,17 +122,17 @@ function DetailPage({ projectId }: IProps) {
                                 <div className="py-4 flex flex-col">
                                     <div className="grid grid-cols-5 gap-6">
                                         <ItemRow label="Chủ sở hữu" value={project.owner_name} />
-                                        <ItemRow 
-                                            label="Trạng thái" 
-                                            value={<Badge color={projectStatus.color} text={projectStatus.label} />} 
+                                        <ItemRow
+                                            label="Trạng thái"
+                                            value={projectStatus.label}
                                         />
-                                        <ItemRow 
-                                            label="Ngày bắt đầu" 
-                                            value={project.expected_start_date ? formatDate(project.expected_start_date) : "---"} 
+                                        <ItemRow
+                                            label="Ngày bắt đầu"
+                                            value={project.expected_start_date ? formatDate(project.expected_start_date) : "---"}
                                         />
-                                        <ItemRow 
-                                            label="Ngày kết thúc" 
-                                            value={project.expected_end_date ? formatDate(project.expected_end_date) : "---"} 
+                                        <ItemRow
+                                            label="Ngày kết thúc"
+                                            value={project.expected_end_date ? formatDate(project.expected_end_date) : "---"}
                                         />
                                         <ItemRow label="Ngày tạo" value={formatDate(project.createdAt)} />
                                     </div>
